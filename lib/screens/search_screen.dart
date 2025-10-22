@@ -174,6 +174,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   width: 80,
                   height: 100,
                   fit: BoxFit.cover,
+                  headers: const {
+                    'Referer': 'https://www.webtoons.com/',
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                  },
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 80,

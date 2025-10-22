@@ -118,7 +118,7 @@ mod tests {
 
         println!("Trouvé {} résultats:", results.len());
         for result in results.iter().take(3) {
-            println!("  - {} par {}", result.title, result.author);
+            println!("  - {} par {}", result.title, result.cover_url);
         }
     }
 }
