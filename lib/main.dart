@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inktoon/src/rust/api/simple.dart';
+import 'package:inktoon/screens/search_screen.dart';
 import 'package:inktoon/src/rust/frb_generated.dart';
 
 Future<void> main() async {
@@ -13,14 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
-        body: Center(
-          child: Text(
-            'Action: Call Rust `greet("Tom")`\nResult: `${greet(name: "Tom")}`',
-          ),
-        ),
-      ),
+      title: 'Inktoon',
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      home: const SearchScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

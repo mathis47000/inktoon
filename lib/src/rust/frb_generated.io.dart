@@ -25,10 +25,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<WebtoonResult> dco_decode_list_webtoon_result(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
-  void dco_decode_unit(dynamic raw);
+  WebtoonResult dco_decode_webtoon_result(dynamic raw);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -37,10 +40,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<WebtoonResult> sse_decode_list_webtoon_result(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
-  void sse_decode_unit(SseDeserializer deserializer);
+  WebtoonResult sse_decode_webtoon_result(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -58,10 +66,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_webtoon_result(
+    List<WebtoonResult> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
+  void sse_encode_webtoon_result(WebtoonResult self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
