@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inktoon/models/webtoon_result.dart' hide WebtoonResult;
+import 'package:inktoon/screens/list_chapter.dart';
 import 'package:inktoon/src/rust/api/simple.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -43,6 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
       // Convertir les résultats Rust en nos modèles Dart
       final results = rustResults.map((r) {
         return WebtoonResult(
+          titleNo: r.titleNo,
           title: r.title,
           author: r.author,
           views: r.views,
@@ -155,10 +156,13 @@ class _SearchScreenState extends State<SearchScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          // TODO: Navigation vers les détails
-          ScaffoldMessenger.of(
+          // ouvrir la liste des chapitres du webtoon
+          Navigator.push(
             context,
-          ).showSnackBar(SnackBar(content: Text('Ouvrir ${result.title}')));
+            MaterialPageRoute(
+              builder: (context) => ListChapter(webtoonId: result.titleNo),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

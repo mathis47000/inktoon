@@ -64,7 +64,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -397294179;
+  int get rustContentHash => -1211738566;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -75,6 +75,10 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<List<ApiEpisodeItem>> crateApiSimpleGetWebtoonEpisodes({
+    required String titleNo,
+  });
+
   Future<List<WebtoonResult>> crateApiSimpleSearchWebtoons({
     required String keyword,
   });
@@ -89,6 +93,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<List<ApiEpisodeItem>> crateApiSimpleGetWebtoonEpisodes({
+    required String titleNo,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(titleNo, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_api_episode_item,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleGetWebtoonEpisodesConstMeta,
+        argValues: [titleNo],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleGetWebtoonEpisodesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_webtoon_episodes",
+        argNames: ["titleNo"],
+      );
+
+  @override
   Future<List<WebtoonResult>> crateApiSimpleSearchWebtoons({
     required String keyword,
   }) {
@@ -100,7 +137,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 2,
             port: port_,
           );
         },
@@ -125,6 +162,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ApiEpisodeItem dco_decode_api_episode_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return ApiEpisodeItem(
+      episodeNo: dco_decode_i_32(arr[0]),
+      episodeTitle: dco_decode_String(arr[1]),
+      thumbnail: dco_decode_String(arr[2]),
+      viewerLink: dco_decode_String(arr[3]),
+      exposureDateMillis: dco_decode_i_64(arr[4]),
+      displayUp: dco_decode_bool(arr[5]),
+      hasBgm: dco_decode_bool(arr[6]),
+    );
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  int dco_decode_i_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeI64(raw);
+  }
+
+  @protected
+  List<ApiEpisodeItem> dco_decode_list_api_episode_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_api_episode_item).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -146,14 +224,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WebtoonResult dco_decode_webtoon_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return WebtoonResult(
-      title: dco_decode_String(arr[0]),
-      author: dco_decode_String(arr[1]),
-      views: dco_decode_String(arr[2]),
-      url: dco_decode_String(arr[3]),
-      coverUrl: dco_decode_String(arr[4]),
+      titleNo: dco_decode_String(arr[0]),
+      title: dco_decode_String(arr[1]),
+      author: dco_decode_String(arr[2]),
+      views: dco_decode_String(arr[3]),
+      url: dco_decode_String(arr[4]),
+      coverUrl: dco_decode_String(arr[5]),
     );
   }
 
@@ -162,6 +241,59 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  ApiEpisodeItem sse_decode_api_episode_item(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_episodeNo = sse_decode_i_32(deserializer);
+    var var_episodeTitle = sse_decode_String(deserializer);
+    var var_thumbnail = sse_decode_String(deserializer);
+    var var_viewerLink = sse_decode_String(deserializer);
+    var var_exposureDateMillis = sse_decode_i_64(deserializer);
+    var var_displayUp = sse_decode_bool(deserializer);
+    var var_hasBgm = sse_decode_bool(deserializer);
+    return ApiEpisodeItem(
+      episodeNo: var_episodeNo,
+      episodeTitle: var_episodeTitle,
+      thumbnail: var_thumbnail,
+      viewerLink: var_viewerLink,
+      exposureDateMillis: var_exposureDateMillis,
+      displayUp: var_displayUp,
+      hasBgm: var_hasBgm,
+    );
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getPlatformInt64();
+  }
+
+  @protected
+  List<ApiEpisodeItem> sse_decode_list_api_episode_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ApiEpisodeItem>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_api_episode_item(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -194,12 +326,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   WebtoonResult sse_decode_webtoon_result(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_titleNo = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_author = sse_decode_String(deserializer);
     var var_views = sse_decode_String(deserializer);
     var var_url = sse_decode_String(deserializer);
     var var_coverUrl = sse_decode_String(deserializer);
     return WebtoonResult(
+      titleNo: var_titleNo,
       title: var_title,
       author: var_author,
       views: var_views,
@@ -209,21 +343,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
-  }
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_api_episode_item(
+    ApiEpisodeItem self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.episodeNo, serializer);
+    sse_encode_String(self.episodeTitle, serializer);
+    sse_encode_String(self.thumbnail, serializer);
+    sse_encode_String(self.viewerLink, serializer);
+    sse_encode_i_64(self.exposureDateMillis, serializer);
+    sse_encode_bool(self.displayUp, serializer);
+    sse_encode_bool(self.hasBgm, serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putPlatformInt64(self);
+  }
+
+  @protected
+  void sse_encode_list_api_episode_item(
+    List<ApiEpisodeItem> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_api_episode_item(item, serializer);
+    }
   }
 
   @protected
@@ -257,22 +424,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_webtoon_result(WebtoonResult self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.titleNo, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.author, serializer);
     sse_encode_String(self.views, serializer);
     sse_encode_String(self.url, serializer);
     sse_encode_String(self.coverUrl, serializer);
-  }
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

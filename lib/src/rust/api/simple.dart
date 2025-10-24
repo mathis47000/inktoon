@@ -6,13 +6,63 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
+// These functions are ignored because they are not marked as `pub`: `format_timestamp`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ApiEpisodesResponse`, `ApiEpisodesResult`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Recherche des webtoons sur Webtoons.com par scraping HTML
 Future<List<WebtoonResult>> searchWebtoons({required String keyword}) =>
     RustLib.instance.api.crateApiSimpleSearchWebtoons(keyword: keyword);
 
+/// Récupère la liste des chapitres d'un webtoon via l'API moderne
+Future<List<ApiEpisodeItem>> getWebtoonEpisodes({required String titleNo}) =>
+    RustLib.instance.api.crateApiSimpleGetWebtoonEpisodes(titleNo: titleNo);
+
+class ApiEpisodeItem {
+  final int episodeNo;
+  final String episodeTitle;
+  final String thumbnail;
+  final String viewerLink;
+  final PlatformInt64 exposureDateMillis;
+  final bool displayUp;
+  final bool hasBgm;
+
+  const ApiEpisodeItem({
+    required this.episodeNo,
+    required this.episodeTitle,
+    required this.thumbnail,
+    required this.viewerLink,
+    required this.exposureDateMillis,
+    required this.displayUp,
+    required this.hasBgm,
+  });
+
+  @override
+  int get hashCode =>
+      episodeNo.hashCode ^
+      episodeTitle.hashCode ^
+      thumbnail.hashCode ^
+      viewerLink.hashCode ^
+      exposureDateMillis.hashCode ^
+      displayUp.hashCode ^
+      hasBgm.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApiEpisodeItem &&
+          runtimeType == other.runtimeType &&
+          episodeNo == other.episodeNo &&
+          episodeTitle == other.episodeTitle &&
+          thumbnail == other.thumbnail &&
+          viewerLink == other.viewerLink &&
+          exposureDateMillis == other.exposureDateMillis &&
+          displayUp == other.displayUp &&
+          hasBgm == other.hasBgm;
+}
+
 class WebtoonResult {
+  final String titleNo;
   final String title;
   final String author;
   final String views;
@@ -20,6 +70,7 @@ class WebtoonResult {
   final String coverUrl;
 
   const WebtoonResult({
+    required this.titleNo,
     required this.title,
     required this.author,
     required this.views,
@@ -29,6 +80,7 @@ class WebtoonResult {
 
   @override
   int get hashCode =>
+      titleNo.hashCode ^
       title.hashCode ^
       author.hashCode ^
       views.hashCode ^
@@ -40,6 +92,7 @@ class WebtoonResult {
       identical(this, other) ||
       other is WebtoonResult &&
           runtimeType == other.runtimeType &&
+          titleNo == other.titleNo &&
           title == other.title &&
           author == other.author &&
           views == other.views &&
