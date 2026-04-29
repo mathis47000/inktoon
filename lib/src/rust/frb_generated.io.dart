@@ -3,6 +3,12 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/chapters.dart';
+import 'api/downloads.dart';
+import 'api/episodes.dart';
+import 'api/library.dart';
+import 'api/models.dart';
+import 'api/search.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -28,22 +34,55 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  CbzMetadata dco_decode_cbz_metadata(dynamic raw);
+
+  @protected
+  ChapterPage dco_decode_chapter_page(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  LibraryInfo dco_decode_library_info(dynamic raw);
+
+  @protected
   List<ApiEpisodeItem> dco_decode_list_api_episode_item(dynamic raw);
+
+  @protected
+  List<CbzMetadata> dco_decode_list_cbz_metadata(dynamic raw);
+
+  @protected
+  List<ChapterPage> dco_decode_list_chapter_page(dynamic raw);
+
+  @protected
+  List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
+
+  @protected
+  Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<WebtoonLibraryItem> dco_decode_list_webtoon_library_item(dynamic raw);
+
+  @protected
   List<WebtoonResult> dco_decode_list_webtoon_result(dynamic raw);
 
   @protected
+  BigInt dco_decode_u_64(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
+
+  @protected
+  WebtoonLibraryItem dco_decode_webtoon_library_item(dynamic raw);
 
   @protected
   WebtoonResult dco_decode_webtoon_result(dynamic raw);
@@ -58,10 +97,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  CbzMetadata sse_decode_cbz_metadata(SseDeserializer deserializer);
+
+  @protected
+  ChapterPage sse_decode_chapter_page(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+
+  @protected
+  LibraryInfo sse_decode_library_info(SseDeserializer deserializer);
 
   @protected
   List<ApiEpisodeItem> sse_decode_list_api_episode_item(
@@ -69,7 +117,29 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<CbzMetadata> sse_decode_list_cbz_metadata(SseDeserializer deserializer);
+
+  @protected
+  List<ChapterPage> sse_decode_list_chapter_page(SseDeserializer deserializer);
+
+  @protected
+  List<Uint8List> sse_decode_list_list_prim_u_8_strict(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
+
+  @protected
+  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  List<WebtoonLibraryItem> sse_decode_list_webtoon_library_item(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<WebtoonResult> sse_decode_list_webtoon_result(
@@ -77,7 +147,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
+
+  @protected
+  WebtoonLibraryItem sse_decode_webtoon_library_item(
+    SseDeserializer deserializer,
+  );
 
   @protected
   WebtoonResult sse_decode_webtoon_result(SseDeserializer deserializer);
@@ -95,14 +173,53 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_cbz_metadata(CbzMetadata self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_chapter_page(ChapterPage self, SseSerializer serializer);
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_info(LibraryInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_api_episode_item(
     List<ApiEpisodeItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_cbz_metadata(
+    List<CbzMetadata> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_chapter_page(
+    List<ChapterPage> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_list_prim_u_8_strict(
+    List<Uint8List> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_i_32_loose(
+    List<int> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_i_32_strict(
+    Int32List self,
     SseSerializer serializer,
   );
 
@@ -113,13 +230,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_webtoon_library_item(
+    List<WebtoonLibraryItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_webtoon_result(
     List<WebtoonResult> self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer);
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_webtoon_library_item(
+    WebtoonLibraryItem self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_webtoon_result(WebtoonResult self, SseSerializer serializer);

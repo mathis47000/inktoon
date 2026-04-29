@@ -4,98 +4,76 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'models.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `format_timestamp`
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ApiEpisodesResponse`, `ApiEpisodesResult`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`, `fmt`
+Future<List<WebtoonResult>> searchWebtoons({
+  required String keyword,
+  required String langage,
+}) => RustLib.instance.api.crateApiSimpleSearchWebtoons(
+  keyword: keyword,
+  langage: langage,
+);
 
-/// Recherche des webtoons sur Webtoons.com par scraping HTML
-Future<List<WebtoonResult>> searchWebtoons({required String keyword}) =>
-    RustLib.instance.api.crateApiSimpleSearchWebtoons(keyword: keyword);
-
-/// Récupère la liste des chapitres d'un webtoon via l'API moderne
 Future<List<ApiEpisodeItem>> getWebtoonEpisodes({required String titleNo}) =>
     RustLib.instance.api.crateApiSimpleGetWebtoonEpisodes(titleNo: titleNo);
 
-class ApiEpisodeItem {
-  final int episodeNo;
-  final String episodeTitle;
-  final String thumbnail;
-  final String viewerLink;
-  final PlatformInt64 exposureDateMillis;
-  final bool displayUp;
-  final bool hasBgm;
+Future<List<ChapterPage>> getChapterPages({required String chapUrl}) =>
+    RustLib.instance.api.crateApiSimpleGetChapterPages(chapUrl: chapUrl);
 
-  const ApiEpisodeItem({
-    required this.episodeNo,
-    required this.episodeTitle,
-    required this.thumbnail,
-    required this.viewerLink,
-    required this.exposureDateMillis,
-    required this.displayUp,
-    required this.hasBgm,
-  });
+Future<Uint8List> downloadImage({required String imageUrl}) =>
+    RustLib.instance.api.crateApiSimpleDownloadImage(imageUrl: imageUrl);
 
-  @override
-  int get hashCode =>
-      episodeNo.hashCode ^
-      episodeTitle.hashCode ^
-      thumbnail.hashCode ^
-      viewerLink.hashCode ^
-      exposureDateMillis.hashCode ^
-      displayUp.hashCode ^
-      hasBgm.hashCode;
+Future<List<Uint8List>> downloadChapterImages({required String url}) =>
+    RustLib.instance.api.crateApiSimpleDownloadChapterImages(url: url);
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ApiEpisodeItem &&
-          runtimeType == other.runtimeType &&
-          episodeNo == other.episodeNo &&
-          episodeTitle == other.episodeTitle &&
-          thumbnail == other.thumbnail &&
-          viewerLink == other.viewerLink &&
-          exposureDateMillis == other.exposureDateMillis &&
-          displayUp == other.displayUp &&
-          hasBgm == other.hasBgm;
-}
+Future<CbzMetadata> downloadChapterAsCbz({
+  required String basePath,
+  required String webtoonId,
+  required String webtoonTitle,
+  required String chapterUrl,
+  required int chapterNumber,
+  required String chapterTitle,
+}) => RustLib.instance.api.crateApiSimpleDownloadChapterAsCbz(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  webtoonTitle: webtoonTitle,
+  chapterUrl: chapterUrl,
+  chapterNumber: chapterNumber,
+  chapterTitle: chapterTitle,
+);
 
-class WebtoonResult {
-  final String titleNo;
-  final String title;
-  final String author;
-  final String views;
-  final String url;
-  final String coverUrl;
+Future<LibraryInfo> getLibrary({required String basePath}) =>
+    RustLib.instance.api.crateApiSimpleGetLibrary(basePath: basePath);
 
-  const WebtoonResult({
-    required this.titleNo,
-    required this.title,
-    required this.author,
-    required this.views,
-    required this.url,
-    required this.coverUrl,
-  });
+Future<WebtoonLibraryItem> getWebtoonLibrary({
+  required String basePath,
+  required String webtoonId,
+}) => RustLib.instance.api.crateApiSimpleGetWebtoonLibrary(
+  basePath: basePath,
+  webtoonId: webtoonId,
+);
 
-  @override
-  int get hashCode =>
-      titleNo.hashCode ^
-      title.hashCode ^
-      author.hashCode ^
-      views.hashCode ^
-      url.hashCode ^
-      coverUrl.hashCode;
+Future<String> saveWebtoonCover({
+  required String basePath,
+  required String webtoonId,
+  required String coverUrl,
+}) => RustLib.instance.api.crateApiSimpleSaveWebtoonCover(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  coverUrl: coverUrl,
+);
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WebtoonResult &&
-          runtimeType == other.runtimeType &&
-          titleNo == other.titleNo &&
-          title == other.title &&
-          author == other.author &&
-          views == other.views &&
-          url == other.url &&
-          coverUrl == other.coverUrl;
-}
+Future<String> mergeCbzFiles({
+  required String basePath,
+  required String webtoonId,
+  required String webtoonTitle,
+  required List<int> chapterNumbers,
+  required String outputName,
+}) => RustLib.instance.api.crateApiSimpleMergeCbzFiles(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  webtoonTitle: webtoonTitle,
+  chapterNumbers: chapterNumbers,
+  outputName: outputName,
+);

@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1211738566;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -385129550;
 
 // Section: executor
 
@@ -45,6 +45,393 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__downloads__download_chapter_as_cbz_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_chapter_as_cbz",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_title = <String>::sse_decode(&mut deserializer);
+            let api_chapter_url = <String>::sse_decode(&mut deserializer);
+            let api_chapter_number = <i32>::sse_decode(&mut deserializer);
+            let api_chapter_title = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::downloads::download_chapter_as_cbz(
+                        api_base_path,
+                        api_webtoon_id,
+                        api_webtoon_title,
+                        api_chapter_url,
+                        api_chapter_number,
+                        api_chapter_title,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__download_chapter_as_cbz_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_chapter_as_cbz",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_title = <String>::sse_decode(&mut deserializer);
+            let api_chapter_url = <String>::sse_decode(&mut deserializer);
+            let api_chapter_number = <i32>::sse_decode(&mut deserializer);
+            let api_chapter_title = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::download_chapter_as_cbz(
+                        api_base_path,
+                        api_webtoon_id,
+                        api_webtoon_title,
+                        api_chapter_url,
+                        api_chapter_number,
+                        api_chapter_title,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__downloads__download_chapter_images_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_chapter_images",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::downloads::download_chapter_images(api_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__download_chapter_images_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_chapter_images",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::download_chapter_images(api_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__downloads__download_image_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_image",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_image_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::downloads::download_image(api_image_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__download_image_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "download_image",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_image_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::download_image(api_image_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__chapters__get_chapter_pages_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_chapter_pages",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_chap_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::chapters::get_chapter_pages(api_chap_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__get_chapter_pages_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_chapter_pages",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_chap_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::get_chapter_pages(api_chap_url)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__library__get_library_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_library",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::library::get_library(api_base_path)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__get_library_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_library",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::get_library(api_base_path)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__episodes__get_webtoon_episodes_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_webtoon_episodes",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_title_no = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::episodes::get_webtoon_episodes(api_title_no)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__simple__get_webtoon_episodes_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -78,6 +465,274 @@ fn wire__crate__api__simple__get_webtoon_episodes_impl(
         },
     )
 }
+fn wire__crate__api__library__get_webtoon_library_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_webtoon_library",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok =
+                        crate::api::library::get_webtoon_library(api_base_path, api_webtoon_id)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__get_webtoon_library_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_webtoon_library",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok =
+                        crate::api::simple::get_webtoon_library(api_base_path, api_webtoon_id)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__downloads__merge_cbz_files_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "merge_cbz_files",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api__webtoon_title = <String>::sse_decode(&mut deserializer);
+            let api_chapter_numbers = <Vec<i32>>::sse_decode(&mut deserializer);
+            let api_output_name = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::downloads::merge_cbz_files(
+                        api_base_path,
+                        api_webtoon_id,
+                        api__webtoon_title,
+                        api_chapter_numbers,
+                        api_output_name,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__merge_cbz_files_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "merge_cbz_files",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_title = <String>::sse_decode(&mut deserializer);
+            let api_chapter_numbers = <Vec<i32>>::sse_decode(&mut deserializer);
+            let api_output_name = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::merge_cbz_files(
+                        api_base_path,
+                        api_webtoon_id,
+                        api_webtoon_title,
+                        api_chapter_numbers,
+                        api_output_name,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__library__save_webtoon_cover_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "save_webtoon_cover",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api_cover_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::library::save_webtoon_cover(
+                        api_base_path,
+                        api_webtoon_id,
+                        api_cover_url,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__simple__save_webtoon_cover_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "save_webtoon_cover",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_base_path = <String>::sse_decode(&mut deserializer);
+            let api_webtoon_id = <String>::sse_decode(&mut deserializer);
+            let api_cover_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::save_webtoon_cover(
+                        api_base_path,
+                        api_webtoon_id,
+                        api_cover_url,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__search__search_webtoons_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "search_webtoons",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_keyword = <String>::sse_decode(&mut deserializer);
+            let api_langage = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::search::search_webtoons(api_keyword, api_langage)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__simple__search_webtoons_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -101,10 +756,11 @@ fn wire__crate__api__simple__search_webtoons_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keyword = <String>::sse_decode(&mut deserializer);
+            let api_langage = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::simple::search_webtoons(api_keyword)?;
+                    let output_ok = crate::api::simple::search_webtoons(api_keyword, api_langage)?;
                     Ok(output_ok)
                 })())
             }
@@ -122,7 +778,7 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for crate::api::simple::ApiEpisodeItem {
+impl SseDecode for crate::api::models::ApiEpisodeItem {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_episodeNo = <i32>::sse_decode(deserializer);
@@ -132,7 +788,7 @@ impl SseDecode for crate::api::simple::ApiEpisodeItem {
         let mut var_exposureDateMillis = <i64>::sse_decode(deserializer);
         let mut var_displayUp = <bool>::sse_decode(deserializer);
         let mut var_hasBgm = <bool>::sse_decode(deserializer);
-        return crate::api::simple::ApiEpisodeItem {
+        return crate::api::models::ApiEpisodeItem {
             episode_no: var_episodeNo,
             episode_title: var_episodeTitle,
             thumbnail: var_thumbnail,
@@ -151,6 +807,46 @@ impl SseDecode for bool {
     }
 }
 
+impl SseDecode for crate::api::models::CbzMetadata {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_webtoonId = <String>::sse_decode(deserializer);
+        let mut var_webtoonTitle = <String>::sse_decode(deserializer);
+        let mut var_chapterNumber = <i32>::sse_decode(deserializer);
+        let mut var_chapterTitle = <String>::sse_decode(deserializer);
+        let mut var_pageCount = <i32>::sse_decode(deserializer);
+        let mut var_fileSize = <u64>::sse_decode(deserializer);
+        let mut var_createdAt = <String>::sse_decode(deserializer);
+        let mut var_filePath = <String>::sse_decode(deserializer);
+        return crate::api::models::CbzMetadata {
+            webtoon_id: var_webtoonId,
+            webtoon_title: var_webtoonTitle,
+            chapter_number: var_chapterNumber,
+            chapter_title: var_chapterTitle,
+            page_count: var_pageCount,
+            file_size: var_fileSize,
+            created_at: var_createdAt,
+            file_path: var_filePath,
+        };
+    }
+}
+
+impl SseDecode for crate::api::models::ChapterPage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_pageNumber = <i32>::sse_decode(deserializer);
+        let mut var_imageUrl = <String>::sse_decode(deserializer);
+        let mut var_width = <i32>::sse_decode(deserializer);
+        let mut var_height = <i32>::sse_decode(deserializer);
+        return crate::api::models::ChapterPage {
+            page_number: var_pageNumber,
+            image_url: var_imageUrl,
+            width: var_width,
+            height: var_height,
+        };
+    }
+}
+
 impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -165,15 +861,74 @@ impl SseDecode for i64 {
     }
 }
 
-impl SseDecode for Vec<crate::api::simple::ApiEpisodeItem> {
+impl SseDecode for crate::api::models::LibraryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_webtoons =
+            <Vec<crate::api::models::WebtoonLibraryItem>>::sse_decode(deserializer);
+        return crate::api::models::LibraryInfo {
+            webtoons: var_webtoons,
+        };
+    }
+}
+
+impl SseDecode for Vec<crate::api::models::ApiEpisodeItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::simple::ApiEpisodeItem>::sse_decode(
+            ans_.push(<crate::api::models::ApiEpisodeItem>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::models::CbzMetadata> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::models::CbzMetadata>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::models::ChapterPage> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::models::ChapterPage>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<Vec<u8>>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<i32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<i32>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -191,17 +946,38 @@ impl SseDecode for Vec<u8> {
     }
 }
 
-impl SseDecode for Vec<crate::api::simple::WebtoonResult> {
+impl SseDecode for Vec<crate::api::models::WebtoonLibraryItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::simple::WebtoonResult>::sse_decode(
+            ans_.push(<crate::api::models::WebtoonLibraryItem>::sse_decode(
                 deserializer,
             ));
         }
         return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::models::WebtoonResult> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::models::WebtoonResult>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u64::<NativeEndian>().unwrap()
     }
 }
 
@@ -212,7 +988,25 @@ impl SseDecode for u8 {
     }
 }
 
-impl SseDecode for crate::api::simple::WebtoonResult {
+impl SseDecode for crate::api::models::WebtoonLibraryItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_webtoonId = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_coverPath = <String>::sse_decode(deserializer);
+        let mut var_chapters = <Vec<crate::api::models::CbzMetadata>>::sse_decode(deserializer);
+        let mut var_totalSize = <u64>::sse_decode(deserializer);
+        return crate::api::models::WebtoonLibraryItem {
+            webtoon_id: var_webtoonId,
+            title: var_title,
+            cover_path: var_coverPath,
+            chapters: var_chapters,
+            total_size: var_totalSize,
+        };
+    }
+}
+
+impl SseDecode for crate::api::models::WebtoonResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_titleNo = <String>::sse_decode(deserializer);
@@ -221,7 +1015,7 @@ impl SseDecode for crate::api::simple::WebtoonResult {
         let mut var_views = <String>::sse_decode(deserializer);
         let mut var_url = <String>::sse_decode(deserializer);
         let mut var_coverUrl = <String>::sse_decode(deserializer);
-        return crate::api::simple::WebtoonResult {
+        return crate::api::models::WebtoonResult {
             title_no: var_titleNo,
             title: var_title,
             author: var_author,
@@ -241,8 +1035,52 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__simple__get_webtoon_episodes_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__simple__search_webtoons_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire__crate__api__downloads__download_chapter_as_cbz_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        2 => wire__crate__api__simple__download_chapter_as_cbz_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        3 => wire__crate__api__downloads__download_chapter_images_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        4 => wire__crate__api__simple__download_chapter_images_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        5 => wire__crate__api__downloads__download_image_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__simple__download_image_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__chapters__get_chapter_pages_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__simple__get_chapter_pages_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__library__get_library_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__simple__get_library_impl(port, ptr, rust_vec_len, data_len),
+        11 => {
+            wire__crate__api__episodes__get_webtoon_episodes_impl(port, ptr, rust_vec_len, data_len)
+        }
+        12 => {
+            wire__crate__api__simple__get_webtoon_episodes_impl(port, ptr, rust_vec_len, data_len)
+        }
+        13 => {
+            wire__crate__api__library__get_webtoon_library_impl(port, ptr, rust_vec_len, data_len)
+        }
+        14 => wire__crate__api__simple__get_webtoon_library_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__downloads__merge_cbz_files_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__simple__merge_cbz_files_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__library__save_webtoon_cover_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__simple__save_webtoon_cover_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__search__search_webtoons_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__simple__search_webtoons_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -262,7 +1100,7 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::simple::ApiEpisodeItem {
+impl flutter_rust_bridge::IntoDart for crate::api::models::ApiEpisodeItem {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.episode_no.into_into_dart().into_dart(),
@@ -277,18 +1115,109 @@ impl flutter_rust_bridge::IntoDart for crate::api::simple::ApiEpisodeItem {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::simple::ApiEpisodeItem
+    for crate::api::models::ApiEpisodeItem
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::simple::ApiEpisodeItem>
-    for crate::api::simple::ApiEpisodeItem
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::ApiEpisodeItem>
+    for crate::api::models::ApiEpisodeItem
 {
-    fn into_into_dart(self) -> crate::api::simple::ApiEpisodeItem {
+    fn into_into_dart(self) -> crate::api::models::ApiEpisodeItem {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::simple::WebtoonResult {
+impl flutter_rust_bridge::IntoDart for crate::api::models::CbzMetadata {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.webtoon_id.into_into_dart().into_dart(),
+            self.webtoon_title.into_into_dart().into_dart(),
+            self.chapter_number.into_into_dart().into_dart(),
+            self.chapter_title.into_into_dart().into_dart(),
+            self.page_count.into_into_dart().into_dart(),
+            self.file_size.into_into_dart().into_dart(),
+            self.created_at.into_into_dart().into_dart(),
+            self.file_path.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::models::CbzMetadata
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::CbzMetadata>
+    for crate::api::models::CbzMetadata
+{
+    fn into_into_dart(self) -> crate::api::models::CbzMetadata {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::models::ChapterPage {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.page_number.into_into_dart().into_dart(),
+            self.image_url.into_into_dart().into_dart(),
+            self.width.into_into_dart().into_dart(),
+            self.height.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::models::ChapterPage
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::ChapterPage>
+    for crate::api::models::ChapterPage
+{
+    fn into_into_dart(self) -> crate::api::models::ChapterPage {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::models::LibraryInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [self.webtoons.into_into_dart().into_dart()].into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::models::LibraryInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::LibraryInfo>
+    for crate::api::models::LibraryInfo
+{
+    fn into_into_dart(self) -> crate::api::models::LibraryInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::models::WebtoonLibraryItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.webtoon_id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.cover_path.into_into_dart().into_dart(),
+            self.chapters.into_into_dart().into_dart(),
+            self.total_size.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::models::WebtoonLibraryItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::WebtoonLibraryItem>
+    for crate::api::models::WebtoonLibraryItem
+{
+    fn into_into_dart(self) -> crate::api::models::WebtoonLibraryItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::models::WebtoonResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.title_no.into_into_dart().into_dart(),
@@ -302,13 +1231,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::simple::WebtoonResult {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::simple::WebtoonResult
+    for crate::api::models::WebtoonResult
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::simple::WebtoonResult>
-    for crate::api::simple::WebtoonResult
+impl flutter_rust_bridge::IntoIntoDart<crate::api::models::WebtoonResult>
+    for crate::api::models::WebtoonResult
 {
-    fn into_into_dart(self) -> crate::api::simple::WebtoonResult {
+    fn into_into_dart(self) -> crate::api::models::WebtoonResult {
         self
     }
 }
@@ -320,7 +1249,7 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for crate::api::simple::ApiEpisodeItem {
+impl SseEncode for crate::api::models::ApiEpisodeItem {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.episode_no, serializer);
@@ -340,6 +1269,30 @@ impl SseEncode for bool {
     }
 }
 
+impl SseEncode for crate::api::models::CbzMetadata {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.webtoon_id, serializer);
+        <String>::sse_encode(self.webtoon_title, serializer);
+        <i32>::sse_encode(self.chapter_number, serializer);
+        <String>::sse_encode(self.chapter_title, serializer);
+        <i32>::sse_encode(self.page_count, serializer);
+        <u64>::sse_encode(self.file_size, serializer);
+        <String>::sse_encode(self.created_at, serializer);
+        <String>::sse_encode(self.file_path, serializer);
+    }
+}
+
+impl SseEncode for crate::api::models::ChapterPage {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.page_number, serializer);
+        <String>::sse_encode(self.image_url, serializer);
+        <i32>::sse_encode(self.width, serializer);
+        <i32>::sse_encode(self.height, serializer);
+    }
+}
+
 impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -354,12 +1307,59 @@ impl SseEncode for i64 {
     }
 }
 
-impl SseEncode for Vec<crate::api::simple::ApiEpisodeItem> {
+impl SseEncode for crate::api::models::LibraryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::api::models::WebtoonLibraryItem>>::sse_encode(self.webtoons, serializer);
+    }
+}
+
+impl SseEncode for Vec<crate::api::models::ApiEpisodeItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::simple::ApiEpisodeItem>::sse_encode(item, serializer);
+            <crate::api::models::ApiEpisodeItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::models::CbzMetadata> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::models::CbzMetadata>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::models::ChapterPage> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::models::ChapterPage>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <Vec<u8>>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<i32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <i32>::sse_encode(item, serializer);
         }
     }
 }
@@ -374,13 +1374,30 @@ impl SseEncode for Vec<u8> {
     }
 }
 
-impl SseEncode for Vec<crate::api::simple::WebtoonResult> {
+impl SseEncode for Vec<crate::api::models::WebtoonLibraryItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::simple::WebtoonResult>::sse_encode(item, serializer);
+            <crate::api::models::WebtoonLibraryItem>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for Vec<crate::api::models::WebtoonResult> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::models::WebtoonResult>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u64::<NativeEndian>(self).unwrap();
     }
 }
 
@@ -391,7 +1408,18 @@ impl SseEncode for u8 {
     }
 }
 
-impl SseEncode for crate::api::simple::WebtoonResult {
+impl SseEncode for crate::api::models::WebtoonLibraryItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.webtoon_id, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.cover_path, serializer);
+        <Vec<crate::api::models::CbzMetadata>>::sse_encode(self.chapters, serializer);
+        <u64>::sse_encode(self.total_size, serializer);
+    }
+}
+
+impl SseEncode for crate::api::models::WebtoonResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.title_no, serializer);

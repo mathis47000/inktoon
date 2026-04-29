@@ -3,6 +3,12 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/chapters.dart';
+import 'api/downloads.dart';
+import 'api/episodes.dart';
+import 'api/library.dart';
+import 'api/models.dart';
+import 'api/search.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -64,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1211738566;
+  int get rustContentHash => -385129550;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -75,12 +81,102 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<CbzMetadata> crateApiDownloadsDownloadChapterAsCbz({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required String chapterUrl,
+    required int chapterNumber,
+    required String chapterTitle,
+  });
+
+  Future<CbzMetadata> crateApiSimpleDownloadChapterAsCbz({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required String chapterUrl,
+    required int chapterNumber,
+    required String chapterTitle,
+  });
+
+  Future<List<Uint8List>> crateApiDownloadsDownloadChapterImages({
+    required String url,
+  });
+
+  Future<List<Uint8List>> crateApiSimpleDownloadChapterImages({
+    required String url,
+  });
+
+  Future<Uint8List> crateApiDownloadsDownloadImage({required String imageUrl});
+
+  Future<Uint8List> crateApiSimpleDownloadImage({required String imageUrl});
+
+  Future<List<ChapterPage>> crateApiChaptersGetChapterPages({
+    required String chapUrl,
+  });
+
+  Future<List<ChapterPage>> crateApiSimpleGetChapterPages({
+    required String chapUrl,
+  });
+
+  Future<LibraryInfo> crateApiLibraryGetLibrary({required String basePath});
+
+  Future<LibraryInfo> crateApiSimpleGetLibrary({required String basePath});
+
+  Future<List<ApiEpisodeItem>> crateApiEpisodesGetWebtoonEpisodes({
+    required String titleNo,
+  });
+
   Future<List<ApiEpisodeItem>> crateApiSimpleGetWebtoonEpisodes({
     required String titleNo,
   });
 
+  Future<WebtoonLibraryItem> crateApiLibraryGetWebtoonLibrary({
+    required String basePath,
+    required String webtoonId,
+  });
+
+  Future<WebtoonLibraryItem> crateApiSimpleGetWebtoonLibrary({
+    required String basePath,
+    required String webtoonId,
+  });
+
+  Future<String> crateApiDownloadsMergeCbzFiles({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<int> chapterNumbers,
+    required String outputName,
+  });
+
+  Future<String> crateApiSimpleMergeCbzFiles({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<int> chapterNumbers,
+    required String outputName,
+  });
+
+  Future<String> crateApiLibrarySaveWebtoonCover({
+    required String basePath,
+    required String webtoonId,
+    required String coverUrl,
+  });
+
+  Future<String> crateApiSimpleSaveWebtoonCover({
+    required String basePath,
+    required String webtoonId,
+    required String coverUrl,
+  });
+
+  Future<List<WebtoonResult>> crateApiSearchSearchWebtoons({
+    required String keyword,
+    required String langage,
+  });
+
   Future<List<WebtoonResult>> crateApiSimpleSearchWebtoons({
     required String keyword,
+    required String langage,
   });
 }
 
@@ -91,6 +187,397 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required super.generalizedFrbRustBinding,
     required super.portManager,
   });
+
+  @override
+  Future<CbzMetadata> crateApiDownloadsDownloadChapterAsCbz({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required String chapterUrl,
+    required int chapterNumber,
+    required String chapterTitle,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_String(chapterUrl, serializer);
+          sse_encode_i_32(chapterNumber, serializer);
+          sse_encode_String(chapterTitle, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_cbz_metadata,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiDownloadsDownloadChapterAsCbzConstMeta,
+        argValues: [
+          basePath,
+          webtoonId,
+          webtoonTitle,
+          chapterUrl,
+          chapterNumber,
+          chapterTitle,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsDownloadChapterAsCbzConstMeta =>
+      const TaskConstMeta(
+        debugName: "download_chapter_as_cbz",
+        argNames: [
+          "basePath",
+          "webtoonId",
+          "webtoonTitle",
+          "chapterUrl",
+          "chapterNumber",
+          "chapterTitle",
+        ],
+      );
+
+  @override
+  Future<CbzMetadata> crateApiSimpleDownloadChapterAsCbz({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required String chapterUrl,
+    required int chapterNumber,
+    required String chapterTitle,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_String(chapterUrl, serializer);
+          sse_encode_i_32(chapterNumber, serializer);
+          sse_encode_String(chapterTitle, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_cbz_metadata,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleDownloadChapterAsCbzConstMeta,
+        argValues: [
+          basePath,
+          webtoonId,
+          webtoonTitle,
+          chapterUrl,
+          chapterNumber,
+          chapterTitle,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleDownloadChapterAsCbzConstMeta =>
+      const TaskConstMeta(
+        debugName: "download_chapter_as_cbz",
+        argNames: [
+          "basePath",
+          "webtoonId",
+          "webtoonTitle",
+          "chapterUrl",
+          "chapterNumber",
+          "chapterTitle",
+        ],
+      );
+
+  @override
+  Future<List<Uint8List>> crateApiDownloadsDownloadChapterImages({
+    required String url,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(url, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiDownloadsDownloadChapterImagesConstMeta,
+        argValues: [url],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsDownloadChapterImagesConstMeta =>
+      const TaskConstMeta(
+        debugName: "download_chapter_images",
+        argNames: ["url"],
+      );
+
+  @override
+  Future<List<Uint8List>> crateApiSimpleDownloadChapterImages({
+    required String url,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(url, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleDownloadChapterImagesConstMeta,
+        argValues: [url],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleDownloadChapterImagesConstMeta =>
+      const TaskConstMeta(
+        debugName: "download_chapter_images",
+        argNames: ["url"],
+      );
+
+  @override
+  Future<Uint8List> crateApiDownloadsDownloadImage({required String imageUrl}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(imageUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiDownloadsDownloadImageConstMeta,
+        argValues: [imageUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsDownloadImageConstMeta =>
+      const TaskConstMeta(debugName: "download_image", argNames: ["imageUrl"]);
+
+  @override
+  Future<Uint8List> crateApiSimpleDownloadImage({required String imageUrl}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(imageUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleDownloadImageConstMeta,
+        argValues: [imageUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleDownloadImageConstMeta =>
+      const TaskConstMeta(debugName: "download_image", argNames: ["imageUrl"]);
+
+  @override
+  Future<List<ChapterPage>> crateApiChaptersGetChapterPages({
+    required String chapUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(chapUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_chapter_page,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiChaptersGetChapterPagesConstMeta,
+        argValues: [chapUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiChaptersGetChapterPagesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_chapter_pages",
+        argNames: ["chapUrl"],
+      );
+
+  @override
+  Future<List<ChapterPage>> crateApiSimpleGetChapterPages({
+    required String chapUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(chapUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_chapter_page,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleGetChapterPagesConstMeta,
+        argValues: [chapUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleGetChapterPagesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_chapter_pages",
+        argNames: ["chapUrl"],
+      );
+
+  @override
+  Future<LibraryInfo> crateApiLibraryGetLibrary({required String basePath}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 9,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_library_info,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiLibraryGetLibraryConstMeta,
+        argValues: [basePath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLibraryGetLibraryConstMeta =>
+      const TaskConstMeta(debugName: "get_library", argNames: ["basePath"]);
+
+  @override
+  Future<LibraryInfo> crateApiSimpleGetLibrary({required String basePath}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_library_info,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleGetLibraryConstMeta,
+        argValues: [basePath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleGetLibraryConstMeta =>
+      const TaskConstMeta(debugName: "get_library", argNames: ["basePath"]);
+
+  @override
+  Future<List<ApiEpisodeItem>> crateApiEpisodesGetWebtoonEpisodes({
+    required String titleNo,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(titleNo, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_api_episode_item,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiEpisodesGetWebtoonEpisodesConstMeta,
+        argValues: [titleNo],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEpisodesGetWebtoonEpisodesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_webtoon_episodes",
+        argNames: ["titleNo"],
+      );
 
   @override
   Future<List<ApiEpisodeItem>> crateApiSimpleGetWebtoonEpisodes({
@@ -104,7 +591,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 12,
             port: port_,
           );
         },
@@ -126,18 +613,305 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<WebtoonResult>> crateApiSimpleSearchWebtoons({
+  Future<WebtoonLibraryItem> crateApiLibraryGetWebtoonLibrary({
+    required String basePath,
+    required String webtoonId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_webtoon_library_item,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiLibraryGetWebtoonLibraryConstMeta,
+        argValues: [basePath, webtoonId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLibraryGetWebtoonLibraryConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_webtoon_library",
+        argNames: ["basePath", "webtoonId"],
+      );
+
+  @override
+  Future<WebtoonLibraryItem> crateApiSimpleGetWebtoonLibrary({
+    required String basePath,
+    required String webtoonId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_webtoon_library_item,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleGetWebtoonLibraryConstMeta,
+        argValues: [basePath, webtoonId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleGetWebtoonLibraryConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_webtoon_library",
+        argNames: ["basePath", "webtoonId"],
+      );
+
+  @override
+  Future<String> crateApiDownloadsMergeCbzFiles({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<int> chapterNumbers,
+    required String outputName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_list_prim_i_32_loose(chapterNumbers, serializer);
+          sse_encode_String(outputName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiDownloadsMergeCbzFilesConstMeta,
+        argValues: [
+          basePath,
+          webtoonId,
+          webtoonTitle,
+          chapterNumbers,
+          outputName,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsMergeCbzFilesConstMeta =>
+      const TaskConstMeta(
+        debugName: "merge_cbz_files",
+        argNames: [
+          "basePath",
+          "webtoonId",
+          "webtoonTitle",
+          "chapterNumbers",
+          "outputName",
+        ],
+      );
+
+  @override
+  Future<String> crateApiSimpleMergeCbzFiles({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<int> chapterNumbers,
+    required String outputName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_list_prim_i_32_loose(chapterNumbers, serializer);
+          sse_encode_String(outputName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleMergeCbzFilesConstMeta,
+        argValues: [
+          basePath,
+          webtoonId,
+          webtoonTitle,
+          chapterNumbers,
+          outputName,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleMergeCbzFilesConstMeta =>
+      const TaskConstMeta(
+        debugName: "merge_cbz_files",
+        argNames: [
+          "basePath",
+          "webtoonId",
+          "webtoonTitle",
+          "chapterNumbers",
+          "outputName",
+        ],
+      );
+
+  @override
+  Future<String> crateApiLibrarySaveWebtoonCover({
+    required String basePath,
+    required String webtoonId,
+    required String coverUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(coverUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 17,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiLibrarySaveWebtoonCoverConstMeta,
+        argValues: [basePath, webtoonId, coverUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLibrarySaveWebtoonCoverConstMeta =>
+      const TaskConstMeta(
+        debugName: "save_webtoon_cover",
+        argNames: ["basePath", "webtoonId", "coverUrl"],
+      );
+
+  @override
+  Future<String> crateApiSimpleSaveWebtoonCover({
+    required String basePath,
+    required String webtoonId,
+    required String coverUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(coverUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleSaveWebtoonCoverConstMeta,
+        argValues: [basePath, webtoonId, coverUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleSaveWebtoonCoverConstMeta =>
+      const TaskConstMeta(
+        debugName: "save_webtoon_cover",
+        argNames: ["basePath", "webtoonId", "coverUrl"],
+      );
+
+  @override
+  Future<List<WebtoonResult>> crateApiSearchSearchWebtoons({
     required String keyword,
+    required String langage,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
+          sse_encode_String(langage, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 19,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_webtoon_result,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSearchSearchWebtoonsConstMeta,
+        argValues: [keyword, langage],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSearchSearchWebtoonsConstMeta =>
+      const TaskConstMeta(
+        debugName: "search_webtoons",
+        argNames: ["keyword", "langage"],
+      );
+
+  @override
+  Future<List<WebtoonResult>> crateApiSimpleSearchWebtoons({
+    required String keyword,
+    required String langage,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(keyword, serializer);
+          sse_encode_String(langage, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
             port: port_,
           );
         },
@@ -146,14 +920,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiSimpleSearchWebtoonsConstMeta,
-        argValues: [keyword],
+        argValues: [keyword, langage],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiSimpleSearchWebtoonsConstMeta =>
-      const TaskConstMeta(debugName: "search_webtoons", argNames: ["keyword"]);
+      const TaskConstMeta(
+        debugName: "search_webtoons",
+        argNames: ["keyword", "langage"],
+      );
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -185,6 +962,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CbzMetadata dco_decode_cbz_metadata(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return CbzMetadata(
+      webtoonId: dco_decode_String(arr[0]),
+      webtoonTitle: dco_decode_String(arr[1]),
+      chapterNumber: dco_decode_i_32(arr[2]),
+      chapterTitle: dco_decode_String(arr[3]),
+      pageCount: dco_decode_i_32(arr[4]),
+      fileSize: dco_decode_u_64(arr[5]),
+      createdAt: dco_decode_String(arr[6]),
+      filePath: dco_decode_String(arr[7]),
+    );
+  }
+
+  @protected
+  ChapterPage dco_decode_chapter_page(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ChapterPage(
+      pageNumber: dco_decode_i_32(arr[0]),
+      imageUrl: dco_decode_String(arr[1]),
+      width: dco_decode_i_32(arr[2]),
+      height: dco_decode_i_32(arr[3]),
+    );
+  }
+
+  @protected
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -197,9 +1006,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LibraryInfo dco_decode_library_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return LibraryInfo(webtoons: dco_decode_list_webtoon_library_item(arr[0]));
+  }
+
+  @protected
   List<ApiEpisodeItem> dco_decode_list_api_episode_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_api_episode_item).toList();
+  }
+
+  @protected
+  List<CbzMetadata> dco_decode_list_cbz_metadata(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_cbz_metadata).toList();
+  }
+
+  @protected
+  List<ChapterPage> dco_decode_list_chapter_page(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_chapter_page).toList();
+  }
+
+  @protected
+  List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_list_prim_u_8_strict).toList();
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_i_32_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
+  }
+
+  @protected
+  Int32List dco_decode_list_prim_i_32_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Int32List;
   }
 
   @protected
@@ -209,15 +1057,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<WebtoonLibraryItem> dco_decode_list_webtoon_library_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_webtoon_library_item).toList();
+  }
+
+  @protected
   List<WebtoonResult> dco_decode_list_webtoon_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_webtoon_result).toList();
   }
 
   @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  WebtoonLibraryItem dco_decode_webtoon_library_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return WebtoonLibraryItem(
+      webtoonId: dco_decode_String(arr[0]),
+      title: dco_decode_String(arr[1]),
+      coverPath: dco_decode_String(arr[2]),
+      chapters: dco_decode_list_cbz_metadata(arr[3]),
+      totalSize: dco_decode_u_64(arr[4]),
+    );
   }
 
   @protected
@@ -271,6 +1146,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CbzMetadata sse_decode_cbz_metadata(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_webtoonId = sse_decode_String(deserializer);
+    var var_webtoonTitle = sse_decode_String(deserializer);
+    var var_chapterNumber = sse_decode_i_32(deserializer);
+    var var_chapterTitle = sse_decode_String(deserializer);
+    var var_pageCount = sse_decode_i_32(deserializer);
+    var var_fileSize = sse_decode_u_64(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_filePath = sse_decode_String(deserializer);
+    return CbzMetadata(
+      webtoonId: var_webtoonId,
+      webtoonTitle: var_webtoonTitle,
+      chapterNumber: var_chapterNumber,
+      chapterTitle: var_chapterTitle,
+      pageCount: var_pageCount,
+      fileSize: var_fileSize,
+      createdAt: var_createdAt,
+      filePath: var_filePath,
+    );
+  }
+
+  @protected
+  ChapterPage sse_decode_chapter_page(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_pageNumber = sse_decode_i_32(deserializer);
+    var var_imageUrl = sse_decode_String(deserializer);
+    var var_width = sse_decode_i_32(deserializer);
+    var var_height = sse_decode_i_32(deserializer);
+    return ChapterPage(
+      pageNumber: var_pageNumber,
+      imageUrl: var_imageUrl,
+      width: var_width,
+      height: var_height,
+    );
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
@@ -280,6 +1193,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getPlatformInt64();
+  }
+
+  @protected
+  LibraryInfo sse_decode_library_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_webtoons = sse_decode_list_webtoon_library_item(deserializer);
+    return LibraryInfo(webtoons: var_webtoons);
   }
 
   @protected
@@ -297,10 +1217,76 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CbzMetadata> sse_decode_list_cbz_metadata(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CbzMetadata>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_cbz_metadata(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ChapterPage> sse_decode_list_chapter_page(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ChapterPage>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_chapter_page(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Uint8List> sse_decode_list_list_prim_u_8_strict(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Uint8List>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_prim_u_8_strict(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getInt32List(len_);
+  }
+
+  @protected
+  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getInt32List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<WebtoonLibraryItem> sse_decode_list_webtoon_library_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WebtoonLibraryItem>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_webtoon_library_item(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -318,9 +1304,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
+  }
+
+  @protected
+  WebtoonLibraryItem sse_decode_webtoon_library_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_webtoonId = sse_decode_String(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_coverPath = sse_decode_String(deserializer);
+    var var_chapters = sse_decode_list_cbz_metadata(deserializer);
+    var var_totalSize = sse_decode_u_64(deserializer);
+    return WebtoonLibraryItem(
+      webtoonId: var_webtoonId,
+      title: var_title,
+      coverPath: var_coverPath,
+      chapters: var_chapters,
+      totalSize: var_totalSize,
+    );
   }
 
   @protected
@@ -370,6 +1381,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_cbz_metadata(CbzMetadata self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.webtoonId, serializer);
+    sse_encode_String(self.webtoonTitle, serializer);
+    sse_encode_i_32(self.chapterNumber, serializer);
+    sse_encode_String(self.chapterTitle, serializer);
+    sse_encode_i_32(self.pageCount, serializer);
+    sse_encode_u_64(self.fileSize, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.filePath, serializer);
+  }
+
+  @protected
+  void sse_encode_chapter_page(ChapterPage self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.pageNumber, serializer);
+    sse_encode_String(self.imageUrl, serializer);
+    sse_encode_i_32(self.width, serializer);
+    sse_encode_i_32(self.height, serializer);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
@@ -379,6 +1412,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putPlatformInt64(self);
+  }
+
+  @protected
+  void sse_encode_library_info(LibraryInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_webtoon_library_item(self.webtoons, serializer);
   }
 
   @protected
@@ -394,6 +1433,64 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_cbz_metadata(
+    List<CbzMetadata> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_cbz_metadata(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_chapter_page(
+    List<ChapterPage> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_chapter_page(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_list_prim_u_8_strict(
+    List<Uint8List> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_prim_u_8_strict(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_i_32_loose(
+    List<int> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putInt32List(
+      self is Int32List ? self : Int32List.fromList(self),
+    );
+  }
+
+  @protected
+  void sse_encode_list_prim_i_32_strict(
+    Int32List self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putInt32List(self);
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -401,6 +1498,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_webtoon_library_item(
+    List<WebtoonLibraryItem> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_webtoon_library_item(item, serializer);
+    }
   }
 
   @protected
@@ -416,9 +1525,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_webtoon_library_item(
+    WebtoonLibraryItem self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.webtoonId, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_String(self.coverPath, serializer);
+    sse_encode_list_cbz_metadata(self.chapters, serializer);
+    sse_encode_u_64(self.totalSize, serializer);
   }
 
   @protected

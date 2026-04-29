@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inktoon/screens/search_screen.dart';
+import 'package:inktoon/screens/home_screen.dart';
 import 'package:inktoon/src/rust/frb_generated.dart';
 
 Future<void> main() async {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Inktoon',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const SearchScreen(),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

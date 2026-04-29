@@ -1,33 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:inktoon/src/rust/api/simple.dart';
+import 'package:inktoon/services/download_service.dart';
+import 'package:inktoon/services/webtoon_service.dart';
+import 'package:inktoon/src/rust/api/models.dart';
+import 'package:inktoon/widgets/chapter_tile.dart';
+import 'package:inktoon/widgets/download_overlay.dart';
 
 class ListChapter extends StatefulWidget {
   final String webtoonId;
-  const ListChapter({super.key, required this.webtoonId});
+  final String webtoonTitle;
+
+  const ListChapter({
+    super.key,
+    required this.webtoonId,
+    this.webtoonTitle = '',
+  });
 
   @override
   State<ListChapter> createState() => _ListChapterState();
 }
 
 class _ListChapterState extends State<ListChapter> {
+  final _webtoonService = WebtoonService();
+  final _downloadService = DownloadService();
+
   List<ApiEpisodeItem> _results = [];
   bool _isLoading = true;
   String? _error;
 
-  // Set pour stocker les chapitres sélectionnés
   final Set<int> _selectedChapters = {};
+
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  String _downloadStatus = '';
+  int _currentChapter = 0;
+  int _totalChapters = 0;
 
   @override
   void initState() {
     super.initState();
-    _performSearch();
+    _loadEpisodes();
   }
 
-  Future<void> _performSearch() async {
+  Future<void> _loadEpisodes() async {
     try {
-      final rustResults = await getWebtoonEpisodes(titleNo: widget.webtoonId);
-      final results = rustResults.toList();
-
+      final results = await _webtoonService.getEpisodes(widget.webtoonId);
       setState(() {
         _results = results;
         _isLoading = false;
@@ -50,218 +66,224 @@ class _ListChapterState extends State<ListChapter> {
     });
   }
 
-  // Séléctionner ou désélectionner tous les chapitres
-  void _toggleSelectAll() {
+  Future<void> _downloadSelected() async {
+    if (_selectedChapters.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun chapitre sélectionné'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final sorted = _selectedChapters.toList()..sort();
+
     setState(() {
-      if (_selectedChapters.length == _results.length) {
-        _selectedChapters.clear();
-      } else {
-        _selectedChapters.addAll(_results.map((chapter) => chapter.episodeNo));
-      }
+      _isDownloading = true;
+      _downloadProgress = 0.0;
+      _totalChapters = sorted.length;
+      _currentChapter = 0;
     });
+
+    try {
+      for (int i = 0; i < sorted.length; i++) {
+        final chapter = _results.firstWhere((ch) => ch.episodeNo == sorted[i]);
+
+        if (!mounted) return;
+        setState(() {
+          _currentChapter = i + 1;
+          _downloadProgress = i / sorted.length;
+        });
+
+        await _downloadService.downloadChapter(
+          webtoonId: widget.webtoonId,
+          webtoonTitle: widget.webtoonTitle,
+          chapter: chapter,
+          onProgress: (status) {
+            if (mounted) setState(() => _downloadStatus = status);
+          },
+        );
+
+        if (!mounted) return;
+        setState(() => _downloadProgress = (i + 1) / sorted.length);
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _isDownloading = false;
+        _selectedChapters.clear();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${sorted.length} chapitre(s) téléchargé(s) !'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isDownloading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // État de chargement
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chargement...'),
+          backgroundColor: Colors.blue,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
-    // État d'erreur
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              'Erreur: $_error',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _performSearch,
-              child: const Text('Réessayer'),
-            ),
-          ],
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Erreur'),
+          backgroundColor: Colors.blue,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Erreur: $_error',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadEpisodes,
+                child: const Text('Réessayer'),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    // État vide
     if (_results.isEmpty) {
-      return const Center(child: Text('Aucun chapitre trouvé'));
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Chapitres'),
+          backgroundColor: Colors.blue,
+        ),
+        body: const Center(child: Text('Aucun chapitre trouvé')),
+      );
     }
 
-    // Grille des chapitres
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recherche Webtoons'),
+        title: const Text('Chapitres'),
         backgroundColor: Colors.blue,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            color: Colors.blue.withOpacity(0.1),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${_selectedChapters.length} chapitre(s) sélectionné(s)',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _toggleSelectAll();
-                  },
-                  child: Text(
-                    _selectedChapters.length == _results.length
-                        ? 'Désélectionner tout'
-                        : 'Sélectionner tout',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Grille
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.7, // Ratio largeur/hauteur
-              ),
-              itemCount: _results.length,
-              itemBuilder: (context, index) {
-                final chapter = _results[index];
-                final isSelected = _selectedChapters.contains(
-                  chapter.episodeNo,
-                );
-
-                return _buildChapterCell(chapter, isSelected);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChapterCell(ApiEpisodeItem chapter, bool isSelected) {
-    return GestureDetector(
-      onTap: () => _toggleSelection(chapter.episodeNo),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey[300]!,
-            width: isSelected ? 3 : 1,
-          ),
-          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.white,
-        ),
-        child: Stack(
-          children: [
-            // Contenu du chapitre
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Thumbnail
-                Expanded(
-                  flex: 4,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(7),
-                      topRight: Radius.circular(7),
-                    ),
-                    child: Image.network(
-                      chapter.thumbnail,
-                      width: 80,
-                      height: 100,
-                      fit: BoxFit.cover,
-                      headers: const {
-                        'Referer': 'https://www.webtoons.com/',
-                        'User-Agent':
-                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 80,
-                          height: 100,
-                          color: Colors.grey[300],
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            size: 40,
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          width: 80,
-                          height: 100,
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-                // Informations
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      chapter.episodeTitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.blue : Colors.black87,
+          Column(
+            children: [
+              if (_selectedChapters.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  color: Colors.blue.withValues(alpha: 0.1),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${_selectedChapters.length} sélectionné(s)',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Badge de sélection
-            if (isSelected)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: _isDownloading
+                                ? null
+                                : () =>
+                                      setState(() => _selectedChapters.clear()),
+                            child: const Text('Désélectionner'),
+                          ),
+                          TextButton.icon(
+                            onPressed: _isDownloading
+                                ? null
+                                : () => setState(
+                                    () => _selectedChapters.addAll(
+                                      _results.map((c) => c.episodeNo),
+                                    ),
+                                  ),
+                            icon: const Icon(Icons.select_all),
+                            label: const Text('Tout'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 16),
+                ),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: _results.length,
+                  itemBuilder: (context, index) {
+                    final chapter = _results[index];
+                    return ChapterTile(
+                      chapter: chapter,
+                      isSelected: _selectedChapters.contains(chapter.episodeNo),
+                      isDisabled: _isDownloading,
+                      onTap: () => _toggleSelection(chapter.episodeNo),
+                    );
+                  },
                 ),
               ),
-          ],
-        ),
+            ],
+          ),
+          if (_selectedChapters.isNotEmpty)
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: FloatingActionButton.extended(
+                onPressed: _isDownloading ? null : _downloadSelected,
+                backgroundColor: _isDownloading ? Colors.grey : Colors.blue,
+                icon: _isDownloading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.download),
+                label: Text(
+                  _isDownloading
+                      ? 'En cours...'
+                      : 'Télécharger (${_selectedChapters.length})',
+                ),
+              ),
+            ),
+          if (_isDownloading)
+            DownloadOverlay(
+              progress: _downloadProgress,
+              currentChapter: _currentChapter,
+              totalChapters: _totalChapters,
+              status: _downloadStatus,
+            ),
+        ],
       ),
     );
   }
