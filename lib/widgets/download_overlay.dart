@@ -36,24 +36,19 @@ class DownloadOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 LinearProgressIndicator(
-                  value: progress,
+                  value: null,
                   minHeight: 8,
                   backgroundColor: Colors.grey[300],
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Text(
-                  '${(progress * 100).toInt()}%',
+                  'Chapitre $currentChapter / $totalChapters',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Chapitre $currentChapter sur $totalChapters',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 4),
                 Text(
