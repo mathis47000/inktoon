@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:inktoon/services/download_service.dart';
 import 'package:inktoon/src/rust/api/models.dart';
+import 'package:inktoon/src/rust/api/simple.dart' as rust;
+import 'package:path_provider/path_provider.dart';
 
 class DownloadProgress {
   final int current;
   final int total;
+  final int currentPage;
+  final int totalPages;
   final String status;
   final bool isDone;
   final String? error;
@@ -13,6 +16,8 @@ class DownloadProgress {
   const DownloadProgress({
     required this.current,
     required this.total,
+    required this.currentPage,
+    required this.totalPages,
     required this.status,
     required this.isDone,
     this.error,
@@ -24,11 +29,11 @@ class DownloadManager {
   static final DownloadManager instance = DownloadManager._();
 
   static const _channel = MethodChannel('inktoon/downloads');
-  final _downloadService = DownloadService();
 
   final _controller = StreamController<DownloadProgress>.broadcast();
   Stream<DownloadProgress> get progress => _controller.stream;
 
+  Timer? _pollTimer;
   bool _isRunning = false;
   bool get isRunning => _isRunning;
 
@@ -49,59 +54,61 @@ class DownloadManager {
     required List<ApiEpisodeItem> chapters,
   }) async {
     if (_isRunning) return;
+
+    final basePath = (await getApplicationDocumentsDirectory()).path;
     _isRunning = true;
     _currentWebtoonId = webtoonId;
     _last = null;
-    final total = chapters.length;
 
-    try {
-      for (int i = 0; i < chapters.length; i++) {
-        final chapter = chapters[i];
-        _emit(DownloadProgress(
-          current: i + 1,
-          total: total,
-          status: 'Ch. ${chapter.episodeNo}',
-          isDone: false,
-        ));
-        _updateNotification(i + 1, total, webtoonTitle);
+    await rust.startBackgroundDownload(
+      basePath: basePath,
+      webtoonId: webtoonId,
+      webtoonTitle: webtoonTitle,
+      chapters: chapters
+          .map((c) => BgChapterTask(
+                chapterUrl: c.viewerLink,
+                chapterNumber: c.episodeNo,
+                chapterTitle: c.episodeTitle,
+              ))
+          .toList(),
+    );
 
-        await _downloadService.downloadChapter(
-          webtoonId: webtoonId,
-          webtoonTitle: webtoonTitle,
-          chapter: chapter,
-          onProgress: (status) => _emit(DownloadProgress(
-            current: i + 1,
-            total: total,
-            status: status,
-            isDone: false,
-          )),
-        );
+    _pollTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
+      final state = await rust.pollDownloadProgress();
+      final p = DownloadProgress(
+        current: state.current,
+        total: state.total,
+        currentPage: state.currentPage,
+        totalPages: state.totalPages,
+        status: state.status,
+        isDone: state.isDone,
+        error: state.error,
+      );
+      _emit(p);
+      _updateNotification(
+          state.current, state.total, state.currentPage, state.totalPages, webtoonTitle);
+
+      if (state.isDone) {
+        _pollTimer?.cancel();
+        _pollTimer = null;
+        _isRunning = false;
+        _currentWebtoonId = null;
+        _cancelNotification();
       }
-      _emit(DownloadProgress(
-        current: total,
-        total: total,
-        status: 'Terminé',
-        isDone: true,
-      ));
-    } catch (e) {
-      _emit(DownloadProgress(
-        current: 0,
-        total: total,
-        status: '',
-        isDone: true,
-        error: e.toString(),
-      ));
-    } finally {
-      _isRunning = false;
-      _currentWebtoonId = null;
-      _cancelNotification();
-    }
+    });
   }
 
-  void _updateNotification(int current, int total, String title) {
+  void cancel() {
+    rust.cancelBackgroundDownload();
+  }
+
+  void _updateNotification(
+      int current, int total, int currentPage, int totalPages, String title) {
     _channel.invokeMethod('updateDownloadNotification', {
       'current': current,
       'total': total,
+      'currentPage': currentPage,
+      'totalPages': totalPages,
       'title': title,
     }).catchError((_) {});
   }

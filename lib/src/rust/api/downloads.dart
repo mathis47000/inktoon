@@ -7,7 +7,26 @@ import '../frb_generated.dart';
 import 'models.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `detect_image_extension`, `update_library_index`
+// These functions are ignored because they are not marked as `pub`: `bg_state`, `detect_image_extension`, `download_chapter_tracked`, `tmp_path_for`, `update_library_index`, `write_cbz`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `BgState`
+
+Future<void> startBackgroundDownload({
+  required String basePath,
+  required String webtoonId,
+  required String webtoonTitle,
+  required List<BgChapterTask> chapters,
+}) => RustLib.instance.api.crateApiDownloadsStartBackgroundDownload(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  webtoonTitle: webtoonTitle,
+  chapters: chapters,
+);
+
+Future<BgDownloadProgress> pollDownloadProgress() =>
+    RustLib.instance.api.crateApiDownloadsPollDownloadProgress();
+
+Future<void> cancelBackgroundDownload() =>
+    RustLib.instance.api.crateApiDownloadsCancelBackgroundDownload();
 
 Future<Uint8List> downloadImage({required String imageUrl}) =>
     RustLib.instance.api.crateApiDownloadsDownloadImage(imageUrl: imageUrl);

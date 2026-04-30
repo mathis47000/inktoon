@@ -62,6 +62,44 @@ pub struct WebtoonLibraryItem {
     pub total_size: u64,
 }
 
+/// Input: one chapter to download in a background job.
+#[derive(Debug, Clone)]
+pub struct BgChapterTask {
+    pub chapter_url: String,
+    pub chapter_number: i32,
+    pub chapter_title: String,
+}
+
+/// Snapshot polled by Dart to track a background download.
+#[derive(Debug, Clone)]
+pub struct BgDownloadProgress {
+    pub is_running: bool,
+    pub current: i32,
+    pub total: i32,
+    pub current_chapter: i32,
+    pub current_page: i32,
+    pub total_pages: i32,
+    pub status: String,
+    pub is_done: bool,
+    pub error: Option<String>,
+}
+
+impl Default for BgDownloadProgress {
+    fn default() -> Self {
+        Self {
+            is_running: false,
+            current: 0,
+            total: 0,
+            current_chapter: 0,
+            current_page: 0,
+            total_pages: 0,
+            status: String::new(),
+            is_done: false,
+            error: None,
+        }
+    }
+}
+
 pub(crate) struct StoragePaths {
     webtoons_dir: PathBuf,
     pub(crate) library_index: PathBuf,

@@ -6,7 +6,6 @@ import 'package:inktoon/services/library_service.dart';
 import 'package:inktoon/services/webtoon_service.dart';
 import 'package:inktoon/src/rust/api/models.dart';
 import 'package:inktoon/widgets/chapter_tile.dart';
-import 'package:inktoon/widgets/download_overlay.dart';
 
 class ListChapter extends StatefulWidget {
   final String webtoonId;
@@ -309,15 +308,6 @@ class _ListChapterState extends State<ListChapter> {
                       : 'Télécharger (${_selectedChapters.length})',
                 ),
               ),
-            ),
-          if (_isDownloading && _progress != null)
-            DownloadOverlay(
-              progress: _progress!.total > 0
-                  ? _progress!.current / _progress!.total
-                  : 0,
-              currentChapter: _progress!.current,
-              totalChapters: _progress!.total,
-              status: _progress!.status,
             ),
         ],
       ),

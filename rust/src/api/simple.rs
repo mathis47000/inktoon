@@ -1,6 +1,7 @@
 // Façade de compatibilité bridge — les implémentations sont dans les sous-modules.
 pub use crate::api::models::{
-    ApiEpisodeItem, CbzMetadata, ChapterPage, LibraryInfo, WebtoonLibraryItem, WebtoonResult,
+    ApiEpisodeItem, BgChapterTask, BgDownloadProgress, CbzMetadata, ChapterPage, LibraryInfo,
+    WebtoonLibraryItem, WebtoonResult,
 };
 
 pub fn search_webtoons(keyword: String, langage: String) -> Result<Vec<WebtoonResult>, String> {
@@ -58,6 +59,28 @@ pub fn save_webtoon_cover(
     cover_url: String,
 ) -> Result<String, String> {
     crate::api::library::save_webtoon_cover(base_path, webtoon_id, cover_url)
+}
+
+pub fn start_background_download(
+    base_path: String,
+    webtoon_id: String,
+    webtoon_title: String,
+    chapters: Vec<BgChapterTask>,
+) -> Result<(), String> {
+    crate::api::downloads::start_background_download(
+        base_path,
+        webtoon_id,
+        webtoon_title,
+        chapters,
+    )
+}
+
+pub fn poll_download_progress() -> BgDownloadProgress {
+    crate::api::downloads::poll_download_progress()
+}
+
+pub fn cancel_background_download() {
+    crate::api::downloads::cancel_background_download()
 }
 
 pub fn merge_cbz_files(

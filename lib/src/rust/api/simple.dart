@@ -64,6 +64,24 @@ Future<String> saveWebtoonCover({
   coverUrl: coverUrl,
 );
 
+Future<void> startBackgroundDownload({
+  required String basePath,
+  required String webtoonId,
+  required String webtoonTitle,
+  required List<BgChapterTask> chapters,
+}) => RustLib.instance.api.crateApiSimpleStartBackgroundDownload(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  webtoonTitle: webtoonTitle,
+  chapters: chapters,
+);
+
+Future<BgDownloadProgress> pollDownloadProgress() =>
+    RustLib.instance.api.crateApiSimplePollDownloadProgress();
+
+Future<void> cancelBackgroundDownload() =>
+    RustLib.instance.api.crateApiSimpleCancelBackgroundDownload();
+
 Future<String> mergeCbzFiles({
   required String basePath,
   required String webtoonId,

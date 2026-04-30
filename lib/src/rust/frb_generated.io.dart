@@ -31,6 +31,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ApiEpisodeItem dco_decode_api_episode_item(dynamic raw);
 
   @protected
+  BgChapterTask dco_decode_bg_chapter_task(dynamic raw);
+
+  @protected
+  BgDownloadProgress dco_decode_bg_download_progress(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -50,6 +56,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ApiEpisodeItem> dco_decode_list_api_episode_item(dynamic raw);
+
+  @protected
+  List<BgChapterTask> dco_decode_list_bg_chapter_task(dynamic raw);
 
   @protected
   List<CbzMetadata> dco_decode_list_cbz_metadata(dynamic raw);
@@ -76,10 +85,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WebtoonResult> dco_decode_list_webtoon_result(dynamic raw);
 
   @protected
+  String? dco_decode_opt_String(dynamic raw);
+
+  @protected
   BigInt dco_decode_u_64(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
+
+  @protected
+  void dco_decode_unit(dynamic raw);
 
   @protected
   WebtoonLibraryItem dco_decode_webtoon_library_item(dynamic raw);
@@ -92,6 +107,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ApiEpisodeItem sse_decode_api_episode_item(SseDeserializer deserializer);
+
+  @protected
+  BgChapterTask sse_decode_bg_chapter_task(SseDeserializer deserializer);
+
+  @protected
+  BgDownloadProgress sse_decode_bg_download_progress(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
@@ -113,6 +136,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ApiEpisodeItem> sse_decode_list_api_episode_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<BgChapterTask> sse_decode_list_bg_chapter_task(
     SseDeserializer deserializer,
   );
 
@@ -147,10 +175,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer);
 
   @protected
   WebtoonLibraryItem sse_decode_webtoon_library_item(
@@ -166,6 +200,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_api_episode_item(
     ApiEpisodeItem self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_bg_chapter_task(BgChapterTask self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bg_download_progress(
+    BgDownloadProgress self,
     SseSerializer serializer,
   );
 
@@ -190,6 +233,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_api_episode_item(
     List<ApiEpisodeItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_bg_chapter_task(
+    List<BgChapterTask> self,
     SseSerializer serializer,
   );
 
@@ -242,10 +291,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer);
 
   @protected
   void sse_encode_webtoon_library_item(

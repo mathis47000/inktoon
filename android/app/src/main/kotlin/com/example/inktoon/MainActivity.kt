@@ -316,11 +316,17 @@ class MainActivity : FlutterFragmentActivity() {
     // ── download notifications ────────────────────────────────────────────────
 
     private fun handleUpdateDownloadNotif(call: MethodCall, result: MethodChannel.Result) {
-        val current = call.argument<Int>("current") ?: 0
-        val total   = call.argument<Int>("total")   ?: 0
-        val title   = call.argument<String>("title") ?: "Téléchargement en cours"
+        val current     = call.argument<Int>("current")     ?: 0
+        val total       = call.argument<Int>("total")       ?: 0
+        val currentPage = call.argument<Int>("currentPage") ?: 0
+        val totalPages  = call.argument<Int>("totalPages")  ?: 0
+        val title       = call.argument<String>("title")    ?: "Téléchargement en cours"
         val nm = NotificationManagerCompat.from(this)
-        showProgress(nm, NOTIF_DOWNLOAD_ID, title, "Chapitre $current / $total", current, total)
+        val text = buildString {
+            append("Ch. $current / $total")
+            if (totalPages > 0) append(" · Page $currentPage / $totalPages")
+        }
+        showProgress(nm, NOTIF_DOWNLOAD_ID, title, text, current, total)
         result.success(null)
     }
 

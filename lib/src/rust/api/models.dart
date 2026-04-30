@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `cbz_path`, `cover_path`, `new`, `webtoon_dir`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `StoragePaths`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 class ApiEpisodeItem {
   final int episodeNo;
@@ -51,6 +51,87 @@ class ApiEpisodeItem {
           exposureDateMillis == other.exposureDateMillis &&
           displayUp == other.displayUp &&
           hasBgm == other.hasBgm;
+}
+
+/// Input: one chapter to download in a background job.
+class BgChapterTask {
+  final String chapterUrl;
+  final int chapterNumber;
+  final String chapterTitle;
+
+  const BgChapterTask({
+    required this.chapterUrl,
+    required this.chapterNumber,
+    required this.chapterTitle,
+  });
+
+  @override
+  int get hashCode =>
+      chapterUrl.hashCode ^ chapterNumber.hashCode ^ chapterTitle.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BgChapterTask &&
+          runtimeType == other.runtimeType &&
+          chapterUrl == other.chapterUrl &&
+          chapterNumber == other.chapterNumber &&
+          chapterTitle == other.chapterTitle;
+}
+
+/// Snapshot polled by Dart to track a background download.
+class BgDownloadProgress {
+  final bool isRunning;
+  final int current;
+  final int total;
+  final int currentChapter;
+  final int currentPage;
+  final int totalPages;
+  final String status;
+  final bool isDone;
+  final String? error;
+
+  const BgDownloadProgress({
+    required this.isRunning,
+    required this.current,
+    required this.total,
+    required this.currentChapter,
+    required this.currentPage,
+    required this.totalPages,
+    required this.status,
+    required this.isDone,
+    this.error,
+  });
+
+  static Future<BgDownloadProgress> default_() =>
+      RustLib.instance.api.crateApiModelsBgDownloadProgressDefault();
+
+  @override
+  int get hashCode =>
+      isRunning.hashCode ^
+      current.hashCode ^
+      total.hashCode ^
+      currentChapter.hashCode ^
+      currentPage.hashCode ^
+      totalPages.hashCode ^
+      status.hashCode ^
+      isDone.hashCode ^
+      error.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BgDownloadProgress &&
+          runtimeType == other.runtimeType &&
+          isRunning == other.isRunning &&
+          current == other.current &&
+          total == other.total &&
+          currentChapter == other.currentChapter &&
+          currentPage == other.currentPage &&
+          totalPages == other.totalPages &&
+          status == other.status &&
+          isDone == other.isDone &&
+          error == other.error;
 }
 
 class CbzMetadata {

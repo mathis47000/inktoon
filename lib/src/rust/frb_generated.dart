@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -385129550;
+  int get rustContentHash => 1070300304;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -81,6 +81,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<BgDownloadProgress> crateApiModelsBgDownloadProgressDefault();
+
+  Future<void> crateApiDownloadsCancelBackgroundDownload();
+
+  Future<void> crateApiSimpleCancelBackgroundDownload();
+
   Future<CbzMetadata> crateApiDownloadsDownloadChapterAsCbz({
     required String basePath,
     required String webtoonId,
@@ -157,6 +163,10 @@ abstract class RustLibApi extends BaseApi {
     required String outputName,
   });
 
+  Future<BgDownloadProgress> crateApiDownloadsPollDownloadProgress();
+
+  Future<BgDownloadProgress> crateApiSimplePollDownloadProgress();
+
   Future<String> crateApiLibrarySaveWebtoonCover({
     required String basePath,
     required String webtoonId,
@@ -178,6 +188,20 @@ abstract class RustLibApi extends BaseApi {
     required String keyword,
     required String langage,
   });
+
+  Future<void> crateApiDownloadsStartBackgroundDownload({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<BgChapterTask> chapters,
+  });
+
+  Future<void> crateApiSimpleStartBackgroundDownload({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<BgChapterTask> chapters,
+  });
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -187,6 +211,96 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required super.generalizedFrbRustBinding,
     required super.portManager,
   });
+
+  @override
+  Future<BgDownloadProgress> crateApiModelsBgDownloadProgressDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bg_download_progress,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiModelsBgDownloadProgressDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiModelsBgDownloadProgressDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "bg_download_progress_default",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiDownloadsCancelBackgroundDownload() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDownloadsCancelBackgroundDownloadConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsCancelBackgroundDownloadConstMeta =>
+      const TaskConstMeta(
+        debugName: "cancel_background_download",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiSimpleCancelBackgroundDownload() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSimpleCancelBackgroundDownloadConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleCancelBackgroundDownloadConstMeta =>
+      const TaskConstMeta(
+        debugName: "cancel_background_download",
+        argNames: [],
+      );
 
   @override
   Future<CbzMetadata> crateApiDownloadsDownloadChapterAsCbz({
@@ -210,7 +324,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 4,
             port: port_,
           );
         },
@@ -267,7 +381,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 5,
             port: port_,
           );
         },
@@ -314,7 +428,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 6,
             port: port_,
           );
         },
@@ -347,7 +461,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 7,
             port: port_,
           );
         },
@@ -378,7 +492,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 8,
             port: port_,
           );
         },
@@ -406,7 +520,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 9,
             port: port_,
           );
         },
@@ -436,7 +550,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 10,
             port: port_,
           );
         },
@@ -469,7 +583,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 11,
             port: port_,
           );
         },
@@ -500,7 +614,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 12,
             port: port_,
           );
         },
@@ -528,7 +642,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 13,
             port: port_,
           );
         },
@@ -558,7 +672,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 14,
             port: port_,
           );
         },
@@ -591,7 +705,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 15,
             port: port_,
           );
         },
@@ -626,7 +740,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 16,
             port: port_,
           );
         },
@@ -661,7 +775,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 14,
+            funcId: 17,
             port: port_,
           );
         },
@@ -702,7 +816,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 18,
             port: port_,
           );
         },
@@ -755,7 +869,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 19,
             port: port_,
           );
         },
@@ -789,6 +903,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<BgDownloadProgress> crateApiDownloadsPollDownloadProgress() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bg_download_progress,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDownloadsPollDownloadProgressConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsPollDownloadProgressConstMeta =>
+      const TaskConstMeta(debugName: "poll_download_progress", argNames: []);
+
+  @override
+  Future<BgDownloadProgress> crateApiSimplePollDownloadProgress() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bg_download_progress,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSimplePollDownloadProgressConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimplePollDownloadProgressConstMeta =>
+      const TaskConstMeta(debugName: "poll_download_progress", argNames: []);
+
+  @override
   Future<String> crateApiLibrarySaveWebtoonCover({
     required String basePath,
     required String webtoonId,
@@ -804,7 +972,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 22,
             port: port_,
           );
         },
@@ -841,7 +1009,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 23,
             port: port_,
           );
         },
@@ -876,7 +1044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 24,
             port: port_,
           );
         },
@@ -911,7 +1079,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 25,
             port: port_,
           );
         },
@@ -930,6 +1098,84 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "search_webtoons",
         argNames: ["keyword", "langage"],
+      );
+
+  @override
+  Future<void> crateApiDownloadsStartBackgroundDownload({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<BgChapterTask> chapters,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_list_bg_chapter_task(chapters, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 26,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiDownloadsStartBackgroundDownloadConstMeta,
+        argValues: [basePath, webtoonId, webtoonTitle, chapters],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDownloadsStartBackgroundDownloadConstMeta =>
+      const TaskConstMeta(
+        debugName: "start_background_download",
+        argNames: ["basePath", "webtoonId", "webtoonTitle", "chapters"],
+      );
+
+  @override
+  Future<void> crateApiSimpleStartBackgroundDownload({
+    required String basePath,
+    required String webtoonId,
+    required String webtoonTitle,
+    required List<BgChapterTask> chapters,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(basePath, serializer);
+          sse_encode_String(webtoonId, serializer);
+          sse_encode_String(webtoonTitle, serializer);
+          sse_encode_list_bg_chapter_task(chapters, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 27,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiSimpleStartBackgroundDownloadConstMeta,
+        argValues: [basePath, webtoonId, webtoonTitle, chapters],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSimpleStartBackgroundDownloadConstMeta =>
+      const TaskConstMeta(
+        debugName: "start_background_download",
+        argNames: ["basePath", "webtoonId", "webtoonTitle", "chapters"],
       );
 
   @protected
@@ -952,6 +1198,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       exposureDateMillis: dco_decode_i_64(arr[4]),
       displayUp: dco_decode_bool(arr[5]),
       hasBgm: dco_decode_bool(arr[6]),
+    );
+  }
+
+  @protected
+  BgChapterTask dco_decode_bg_chapter_task(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return BgChapterTask(
+      chapterUrl: dco_decode_String(arr[0]),
+      chapterNumber: dco_decode_i_32(arr[1]),
+      chapterTitle: dco_decode_String(arr[2]),
+    );
+  }
+
+  @protected
+  BgDownloadProgress dco_decode_bg_download_progress(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return BgDownloadProgress(
+      isRunning: dco_decode_bool(arr[0]),
+      current: dco_decode_i_32(arr[1]),
+      total: dco_decode_i_32(arr[2]),
+      currentChapter: dco_decode_i_32(arr[3]),
+      currentPage: dco_decode_i_32(arr[4]),
+      totalPages: dco_decode_i_32(arr[5]),
+      status: dco_decode_String(arr[6]),
+      isDone: dco_decode_bool(arr[7]),
+      error: dco_decode_opt_String(arr[8]),
     );
   }
 
@@ -1021,6 +1299,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<BgChapterTask> dco_decode_list_bg_chapter_task(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_bg_chapter_task).toList();
+  }
+
+  @protected
   List<CbzMetadata> dco_decode_list_cbz_metadata(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_cbz_metadata).toList();
@@ -1069,6 +1353,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
   BigInt dco_decode_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeU64(raw);
@@ -1078,6 +1368,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
   }
 
   @protected
@@ -1136,6 +1432,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       exposureDateMillis: var_exposureDateMillis,
       displayUp: var_displayUp,
       hasBgm: var_hasBgm,
+    );
+  }
+
+  @protected
+  BgChapterTask sse_decode_bg_chapter_task(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chapterUrl = sse_decode_String(deserializer);
+    var var_chapterNumber = sse_decode_i_32(deserializer);
+    var var_chapterTitle = sse_decode_String(deserializer);
+    return BgChapterTask(
+      chapterUrl: var_chapterUrl,
+      chapterNumber: var_chapterNumber,
+      chapterTitle: var_chapterTitle,
+    );
+  }
+
+  @protected
+  BgDownloadProgress sse_decode_bg_download_progress(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_isRunning = sse_decode_bool(deserializer);
+    var var_current = sse_decode_i_32(deserializer);
+    var var_total = sse_decode_i_32(deserializer);
+    var var_currentChapter = sse_decode_i_32(deserializer);
+    var var_currentPage = sse_decode_i_32(deserializer);
+    var var_totalPages = sse_decode_i_32(deserializer);
+    var var_status = sse_decode_String(deserializer);
+    var var_isDone = sse_decode_bool(deserializer);
+    var var_error = sse_decode_opt_String(deserializer);
+    return BgDownloadProgress(
+      isRunning: var_isRunning,
+      current: var_current,
+      total: var_total,
+      currentChapter: var_currentChapter,
+      currentPage: var_currentPage,
+      totalPages: var_totalPages,
+      status: var_status,
+      isDone: var_isDone,
+      error: var_error,
     );
   }
 
@@ -1212,6 +1548,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ApiEpisodeItem>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_api_episode_item(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<BgChapterTask> sse_decode_list_bg_chapter_task(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <BgChapterTask>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_bg_chapter_task(deserializer));
     }
     return ans_;
   }
@@ -1304,6 +1654,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
@@ -1313,6 +1674,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
+  }
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected
@@ -1375,6 +1741,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_bg_chapter_task(
+    BgChapterTask self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.chapterUrl, serializer);
+    sse_encode_i_32(self.chapterNumber, serializer);
+    sse_encode_String(self.chapterTitle, serializer);
+  }
+
+  @protected
+  void sse_encode_bg_download_progress(
+    BgDownloadProgress self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.isRunning, serializer);
+    sse_encode_i_32(self.current, serializer);
+    sse_encode_i_32(self.total, serializer);
+    sse_encode_i_32(self.currentChapter, serializer);
+    sse_encode_i_32(self.currentPage, serializer);
+    sse_encode_i_32(self.totalPages, serializer);
+    sse_encode_String(self.status, serializer);
+    sse_encode_bool(self.isDone, serializer);
+    sse_encode_opt_String(self.error, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
@@ -1429,6 +1823,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_api_episode_item(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_bg_chapter_task(
+    List<BgChapterTask> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_bg_chapter_task(item, serializer);
     }
   }
 
@@ -1525,6 +1931,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
@@ -1534,6 +1950,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected

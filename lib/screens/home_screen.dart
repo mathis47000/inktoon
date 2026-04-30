@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:inktoon/screens/library_screen.dart';
 import 'package:inktoon/screens/search_screen.dart';
 import 'package:inktoon/screens/transfer_screen.dart';
+import 'package:inktoon/services/download_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +21,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: Column(
+        children: [
+          Expanded(
+            child: IndexedStack(index: _currentIndex, children: _screens),
+          ),
+          const _DownloadBanner(),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) =>
@@ -38,6 +48,97 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.send_to_mobile_outlined),
             selectedIcon: Icon(Icons.send_to_mobile),
             label: 'Transfert',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DownloadBanner extends StatefulWidget {
+  const _DownloadBanner();
+
+  @override
+  State<_DownloadBanner> createState() => _DownloadBannerState();
+}
+
+class _DownloadBannerState extends State<_DownloadBanner> {
+  DownloadProgress? _progress;
+  StreamSubscription<DownloadProgress>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _progress = DownloadManager.instance.lastProgress;
+    _sub = DownloadManager.instance.progress.listen((p) {
+      if (mounted) setState(() => _progress = p);
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = _progress;
+    final visible = p != null && !p.isDone && DownloadManager.instance.isRunning;
+    if (!visible) return const SizedBox.shrink();
+
+    final chapterFraction =
+        p.total > 0 ? (p.current + (p.totalPages > 0 ? p.currentPage / p.totalPages : 0)) / p.total : 0.0;
+
+    final pageText = p.totalPages > 0
+        ? ' · p. ${p.currentPage}/${p.totalPages}'
+        : '';
+
+    return Material(
+      color: Theme.of(context).colorScheme.primaryContainer,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Ch. ${p.current + 1}/${p.total}$pageText',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  p.status,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimaryContainer
+                            .withValues(alpha: 0.7),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          LinearProgressIndicator(
+            value: chapterFraction.clamp(0.0, 1.0),
+            minHeight: 2,
+            backgroundColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
           ),
         ],
       ),
