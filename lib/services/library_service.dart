@@ -19,6 +19,17 @@ class LibraryService {
     return rust.getWebtoonLibrary(basePath: dir.path, webtoonId: webtoonId);
   }
 
+  Future<void> deleteChapter(String webtoonId, int chapterNumber) async {
+    final dir = await getApplicationDocumentsDirectory();
+    await rust.deleteChapter(
+        basePath: dir.path, webtoonId: webtoonId, chapterNumber: chapterNumber);
+  }
+
+  Future<void> deleteWebtoon(String webtoonId) async {
+    final dir = await getApplicationDocumentsDirectory();
+    await rust.deleteWebtoon(basePath: dir.path, webtoonId: webtoonId);
+  }
+
   String formatSize(int bytes) {
     if (bytes < 1024 * 1024) {
       return '${(bytes / 1024).toStringAsFixed(1)} KB';

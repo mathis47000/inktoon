@@ -7,6 +7,8 @@ import '../frb_generated.dart';
 import 'models.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `read_library`, `write_library`
+
 Future<LibraryInfo> getLibrary({required String basePath}) =>
     RustLib.instance.api.crateApiLibraryGetLibrary(basePath: basePath);
 
@@ -14,6 +16,24 @@ Future<WebtoonLibraryItem> getWebtoonLibrary({
   required String basePath,
   required String webtoonId,
 }) => RustLib.instance.api.crateApiLibraryGetWebtoonLibrary(
+  basePath: basePath,
+  webtoonId: webtoonId,
+);
+
+Future<void> deleteChapter({
+  required String basePath,
+  required String webtoonId,
+  required int chapterNumber,
+}) => RustLib.instance.api.crateApiLibraryDeleteChapter(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  chapterNumber: chapterNumber,
+);
+
+Future<void> deleteWebtoon({
+  required String basePath,
+  required String webtoonId,
+}) => RustLib.instance.api.crateApiLibraryDeleteWebtoon(
   basePath: basePath,
   webtoonId: webtoonId,
 );

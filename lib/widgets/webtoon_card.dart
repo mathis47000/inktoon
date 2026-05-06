@@ -47,24 +47,22 @@ class WebtoonCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       webtoon.author,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(
-                          Icons.visibility,
-                          size: 16,
-                          color: Colors.grey[600],
-                        ),
+                        Icon(Icons.visibility,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
                           webtoon.views,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

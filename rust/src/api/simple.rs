@@ -53,6 +53,18 @@ pub fn get_webtoon_library(
     crate::api::library::get_webtoon_library(base_path, webtoon_id)
 }
 
+pub fn delete_chapter(
+    base_path: String,
+    webtoon_id: String,
+    chapter_number: i32,
+) -> Result<(), String> {
+    crate::api::library::delete_chapter(base_path, webtoon_id, chapter_number)
+}
+
+pub fn delete_webtoon(base_path: String, webtoon_id: String) -> Result<(), String> {
+    crate::api::library::delete_webtoon(base_path, webtoon_id)
+}
+
 pub fn save_webtoon_cover(
     base_path: String,
     webtoon_id: String,

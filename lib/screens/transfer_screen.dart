@@ -86,6 +86,37 @@ class _TransferScreenState extends State<TransferScreen> {
     }
   }
 
+  Future<void> _deleteSelected() async {
+    final count = _selected.length;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Supprimer les fichiers ?'),
+        content: Text(
+            '$count fichier(s) seront supprimés définitivement du stockage.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Supprimer')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final toDelete = _files.where((f) => _selected.contains(f.id)).toList();
+    for (final f in toDelete) {
+      try {
+        await _channel.invokeMethod('deleteExportedFile', {'uri': f.uri});
+      } catch (_) {}
+    }
+    setState(() => _selected.clear());
+    await _loadFiles();
+  }
+
   Future<void> _transfer() async {
     final selected = _files.where((f) => _selected.contains(f.id)).toList();
     if (selected.isEmpty) return;
@@ -147,6 +178,13 @@ class _TransferScreenState extends State<TransferScreen> {
       appBar: AppBar(
         title: const Text('Transfert'),
         actions: [
+          if (hasSelection)
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              color: Colors.red[400],
+              tooltip: 'Supprimer la sélection',
+              onPressed: _deleteSelected,
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loading ? null : _refresh,

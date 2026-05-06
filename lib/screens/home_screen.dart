@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:inktoon/screens/home_webtoon_screen.dart';
 import 'package:inktoon/screens/library_screen.dart';
 import 'package:inktoon/screens/search_screen.dart';
 import 'package:inktoon/screens/transfer_screen.dart';
@@ -15,8 +16,23 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  StreamSubscription<void>? _startedSub;
 
-  static const _screens = [SearchScreen(), LibraryScreen(), TransferScreen()];
+  static const _screens = [HomeWebtoonScreen(), SearchScreen(), LibraryScreen(), TransferScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    _startedSub = DownloadManager.instance.started.listen((_) {
+      if (mounted) setState(() => _currentIndex = 2);
+    });
+  }
+
+  @override
+  void dispose() {
+    _startedSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) =>
             setState(() => _currentIndex = index),
         destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Accueil',
+          ),
           NavigationDestination(
             icon: Icon(Icons.search_outlined),
             selectedIcon: Icon(Icons.search),
@@ -130,6 +151,21 @@ class _DownloadBannerState extends State<_DownloadBanner> {
                             .withValues(alpha: 0.7),
                   ),
                   overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: () => DownloadManager.instance.cancel(),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer,
+                    ),
+                  ),
                 ),
               ],
             ),

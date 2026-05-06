@@ -33,12 +33,18 @@ class DownloadManager {
   final _controller = StreamController<DownloadProgress>.broadcast();
   Stream<DownloadProgress> get progress => _controller.stream;
 
+  final _startedController = StreamController<void>.broadcast();
+  Stream<void> get started => _startedController.stream;
+
   Timer? _pollTimer;
   bool _isRunning = false;
   bool get isRunning => _isRunning;
 
   String? _currentWebtoonId;
   String? get currentWebtoonId => _currentWebtoonId;
+
+  String? _currentWebtoonTitle;
+  String? get currentWebtoonTitle => _currentWebtoonTitle;
 
   DownloadProgress? _last;
   DownloadProgress? get lastProgress => _last;
@@ -55,10 +61,19 @@ class DownloadManager {
   }) async {
     if (_isRunning) return;
 
-    final basePath = (await getApplicationDocumentsDirectory()).path;
+    // Set state synchronously before any await so the started event
+    // fires immediately (HomeScreen receives it in the same microtask).
     _isRunning = true;
     _currentWebtoonId = webtoonId;
+    _currentWebtoonTitle = webtoonTitle;
     _last = null;
+    _startedController.add(null);
+
+    final basePath = (await getApplicationDocumentsDirectory()).path;
+
+    await _channel
+        .invokeMethod('startDownloadService', {'title': webtoonTitle})
+        .catchError((_) {});
 
     await rust.startBackgroundDownload(
       basePath: basePath,
@@ -93,6 +108,7 @@ class DownloadManager {
         _pollTimer = null;
         _isRunning = false;
         _currentWebtoonId = null;
+        _currentWebtoonTitle = null;
         _cancelNotification();
       }
     });

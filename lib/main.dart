@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Inktoon',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
       home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );

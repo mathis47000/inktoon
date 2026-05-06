@@ -54,6 +54,24 @@ Future<WebtoonLibraryItem> getWebtoonLibrary({
   webtoonId: webtoonId,
 );
 
+Future<void> deleteChapter({
+  required String basePath,
+  required String webtoonId,
+  required int chapterNumber,
+}) => RustLib.instance.api.crateApiSimpleDeleteChapter(
+  basePath: basePath,
+  webtoonId: webtoonId,
+  chapterNumber: chapterNumber,
+);
+
+Future<void> deleteWebtoon({
+  required String basePath,
+  required String webtoonId,
+}) => RustLib.instance.api.crateApiSimpleDeleteWebtoon(
+  basePath: basePath,
+  webtoonId: webtoonId,
+);
+
 Future<String> saveWebtoonCover({
   required String basePath,
   required String webtoonId,

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:inktoon/screens/list_chapter.dart';
+import 'package:inktoon/services/download_manager.dart';
 import 'package:inktoon/services/export_service.dart';
 import 'package:inktoon/services/library_service.dart';
 import 'package:inktoon/src/rust/api/models.dart';
@@ -20,28 +22,38 @@ class _LibraryScreenState extends State<LibraryScreen> {
   bool _isLoading = true;
   String? _error;
 
+  DownloadProgress? _dlProgress;
+  StreamSubscription<DownloadProgress>? _dlSub;
+
   @override
   void initState() {
     super.initState();
     _load();
+    _dlProgress = DownloadManager.instance.lastProgress;
+    _dlSub = DownloadManager.instance.progress.listen((p) {
+      if (mounted) setState(() => _dlProgress = p);
+      if (p.isDone && p.error == null && mounted) _load();
+    });
+  }
+
+  @override
+  void dispose() {
+    _dlSub?.cancel();
+    super.dispose();
+  }
+
+  bool get _isDownloading {
+    final p = _dlProgress;
+    return DownloadManager.instance.isRunning || (p != null && !p.isDone);
   }
 
   Future<void> _load() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    setState(() { _isLoading = true; _error = null; });
     try {
       final library = await _service.getLibrary();
-      setState(() {
-        _items = library.webtoons;
-        _isLoading = false;
-      });
+      if (mounted) setState(() { _items = library.webtoons; _isLoading = false; });
     } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
+      if (mounted) setState(() { _error = e.toString(); _isLoading = false; });
     }
   }
 
@@ -50,12 +62,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bibliothèque'),
-        backgroundColor: Colors.blue,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _load,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
       ),
       body: _buildBody(),
@@ -68,40 +76,38 @@ class _LibraryScreenState extends State<LibraryScreen> {
     }
 
     if (_error != null) {
+      final scheme = Theme.of(context).colorScheme;
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: scheme.error),
             const SizedBox(height: 16),
-            Text(
-              'Erreur: $_error',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
-            ),
+            Text('Erreur: $_error',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: scheme.error)),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _load, child: const Text('Réessayer')),
+            FilledButton.tonal(onPressed: _load, child: const Text('Réessayer')),
           ],
         ),
       );
     }
 
-    if (_items.isEmpty) {
-      return const Center(
+    final scheme = Theme.of(context).colorScheme;
+
+    if (_items.isEmpty && !_isDownloading) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.library_books_outlined, size: 80, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              'Aucun téléchargement',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Téléchargez des chapitres depuis la recherche',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
+            Icon(Icons.library_books_outlined,
+                size: 80, color: scheme.onSurfaceVariant),
+            const SizedBox(height: 16),
+            Text('Aucun téléchargement',
+                style: TextStyle(fontSize: 18, color: scheme.onSurfaceVariant)),
+            const SizedBox(height: 8),
+            Text('Téléchargez des chapitres depuis la recherche',
+                style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant)),
           ],
         ),
       );
@@ -110,11 +116,147 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _items.length,
-        itemBuilder: (context, index) => _WebtoonLibraryCard(
-          item: _items[index],
-          service: _service,
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        itemCount: _items.length + (_isDownloading ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (_isDownloading && index == 0) {
+            return _DownloadProgressCard(
+              progress: _dlProgress,
+              title: DownloadManager.instance.currentWebtoonTitle ?? 'Téléchargement',
+              onCancel: DownloadManager.instance.cancel,
+            );
+          }
+          final i = _isDownloading ? index - 1 : index;
+          return _WebtoonLibraryCard(
+            item: _items[i],
+            service: _service,
+            onRefresh: _load,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _DownloadProgressCard extends StatelessWidget {
+  final DownloadProgress? progress;
+  final String title;
+  final VoidCallback onCancel;
+
+  const _DownloadProgressCard({
+    required this.progress,
+    required this.title,
+    required this.onCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final p = progress;
+
+    final int current = p?.current ?? 0;
+    final int total = p?.total ?? 0;
+    final int currentPage = p?.currentPage ?? 0;
+    final int totalPages = p?.totalPages ?? 0;
+    final String status = p?.status ?? '';
+
+    final double fraction = total > 0
+        ? (current + (totalPages > 0 ? currentPage / totalPages : 0)) / total
+        : 0.0;
+
+    final String chapterText = total > 0
+        ? 'Chapitre ${current + 1} / $total'
+        : 'Démarrage…';
+
+    final String pageText = totalPages > 0
+        ? 'Page $currentPage / $totalPages'
+        : '';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: scheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: scheme.onPrimaryContainer,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (chapterText.isNotEmpty)
+                        Text(
+                          chapterText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: scheme.onPrimaryContainer
+                                .withValues(alpha: 0.8),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (pageText.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Text(
+                      pageText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: scheme.onPrimaryContainer.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                if (status.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: scheme.onPrimaryContainer.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                IconButton(
+                  icon: Icon(Icons.close,
+                      size: 18, color: scheme.onPrimaryContainer),
+                  tooltip: 'Annuler',
+                  onPressed: onCancel,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: fraction > 0 ? fraction.clamp(0.0, 1.0) : null,
+                minHeight: 4,
+                backgroundColor:
+                    scheme.primary.withValues(alpha: 0.15),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
     );
@@ -124,35 +266,68 @@ class _LibraryScreenState extends State<LibraryScreen> {
 class _WebtoonLibraryCard extends StatelessWidget {
   final WebtoonLibraryItem item;
   final LibraryService service;
+  final VoidCallback onRefresh;
 
-  const _WebtoonLibraryCard({required this.item, required this.service});
+  const _WebtoonLibraryCard({
+    required this.item,
+    required this.service,
+    required this.onRefresh,
+  });
 
-  void _openExportSheet(BuildContext context) {
-    showModalBottomSheet(
+  void _openExportSheet(BuildContext context) async {
+    final refreshNeeded = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _ExportBottomSheet(item: item, service: service),
+      builder: (_) =>
+          _ExportBottomSheet(item: item, service: service, onRefresh: onRefresh),
     );
+    if (refreshNeeded == true) onRefresh();
+  }
+
+  Future<void> _confirmDeleteSeries(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Supprimer la série ?'),
+        content: Text(
+            'Tous les chapitres de « ${item.title} » seront supprimés définitivement.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style:
+                  TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Supprimer')),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    await service.deleteWebtoon(item.webtoonId);
+    onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final coverFile = File(item.coverPath);
+    final chapters = item.chapters;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ListChapter(webtoonId: item.webtoonId),
+            builder: (_) => ListChapter(
+                webtoonId: item.webtoonId, webtoonTitle: item.title),
           ),
         ),
+        onLongPress: () => _confirmDeleteSeries(context),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -162,21 +337,14 @@ class _WebtoonLibraryCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: coverFile.existsSync()
-                    ? Image.file(
-                        coverFile,
-                        width: 80,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      )
+                    ? Image.file(coverFile,
+                        width: 72, height: 96, fit: BoxFit.cover)
                     : Container(
-                        width: 80,
-                        height: 100,
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.book,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
+                        width: 72,
+                        height: 96,
+                        color: scheme.surfaceContainerHighest,
+                        child: Icon(Icons.book_outlined,
+                            color: scheme.onSurfaceVariant),
                       ),
               ),
               const SizedBox(width: 12),
@@ -187,45 +355,30 @@ class _WebtoonLibraryCard extends StatelessWidget {
                     Text(
                       item.title,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 15, fontWeight: FontWeight.w600),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.book_outlined,
-                          size: 16,
-                          color: Colors.blue,
-                        ),
+                        Icon(Icons.book_outlined,
+                            size: 14, color: scheme.primary),
                         const SizedBox(width: 4),
                         Text(
-                          '${item.chapters.length} chapitre(s)',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue,
-                          ),
+                          '${chapters.length} chapitre${chapters.length > 1 ? 's' : ''}',
+                          style: TextStyle(
+                              fontSize: 13, color: scheme.primary),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.storage_outlined,
-                          size: 16,
-                          color: Colors.grey[600],
-                        ),
+                        const SizedBox(width: 12),
+                        Icon(Icons.storage_outlined,
+                            size: 14, color: scheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
                           service.formatSize(item.totalSize.toInt()),
                           style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
+                              fontSize: 13,
+                              color: scheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -233,54 +386,17 @@ class _WebtoonLibraryCard extends StatelessWidget {
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: item.chapters
-                          .take(5)
-                          .map(
-                            (ch) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.blue.withValues(alpha: 0.3),
-                                ),
-                              ),
-                              child: Text(
-                                'Ch. ${ch.chapterNumber}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList()
-                        ..addAll(
-                          item.chapters.length > 5
-                              ? [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '+${item.chapters.length - 5}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ),
-                                ]
-                              : [],
-                        ),
+                      children: [
+                        for (final ch in chapters.take(5))
+                          _ChapterChip(
+                              label: 'Ch. ${ch.chapterNumber}',
+                              scheme: scheme),
+                        if (chapters.length > 5)
+                          _ChapterChip(
+                              label: '+${chapters.length - 5}',
+                              scheme: scheme,
+                              muted: true),
+                      ],
                     ),
                   ],
                 ),
@@ -290,12 +406,12 @@ class _WebtoonLibraryCard extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.save_alt),
-                    color: Colors.blue[600],
                     iconSize: 20,
                     tooltip: 'Exporter pour liseuse',
                     onPressed: () => _openExportSheet(context),
                   ),
-                  const Icon(Icons.chevron_right, color: Colors.grey),
+                  Icon(Icons.chevron_right,
+                      color: scheme.onSurfaceVariant),
                 ],
               ),
             ],
@@ -306,11 +422,48 @@ class _WebtoonLibraryCard extends StatelessWidget {
   }
 }
 
+class _ChapterChip extends StatelessWidget {
+  final String label;
+  final ColorScheme scheme;
+  final bool muted;
+
+  const _ChapterChip({
+    required this.label,
+    required this.scheme,
+    this.muted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: muted
+            ? scheme.surfaceContainerHighest
+            : scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: muted ? scheme.onSurfaceVariant : scheme.onPrimaryContainer,
+        ),
+      ),
+    );
+  }
+}
+
 class _ExportBottomSheet extends StatefulWidget {
   final WebtoonLibraryItem item;
   final LibraryService service;
+  final VoidCallback onRefresh;
 
-  const _ExportBottomSheet({required this.item, required this.service});
+  const _ExportBottomSheet({
+    required this.item,
+    required this.service,
+    required this.onRefresh,
+  });
 
   @override
   State<_ExportBottomSheet> createState() => _ExportBottomSheetState();
@@ -330,6 +483,33 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
 
   int get _selectedSize =>
       _exportService.selectedSize(widget.item, _selected.toList());
+
+  Future<void> _deleteChapter(int chapterNumber) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Supprimer le chapitre ?'),
+        content: Text('Le chapitre $chapterNumber sera supprimé définitivement.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Supprimer')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await widget.service.deleteChapter(widget.item.webtoonId, chapterNumber);
+    setState(() => _selected.remove(chapterNumber));
+    widget.onRefresh();
+    // Close sheet if no chapters remain.
+    if (widget.item.chapters.length == 1 && mounted) {
+      Navigator.pop(context, true);
+    }
+  }
 
   Future<void> _export() async {
     final sorted = _selected.toList()..sort();
@@ -371,10 +551,10 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
         children: [
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
-            width: 40,
+            width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Theme.of(context).colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -382,7 +562,8 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Icon(Icons.send_to_mobile, color: Colors.blue),
+                Icon(Icons.save_alt,
+                    color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -391,13 +572,15 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
                       const Text(
                         'Exporter pour liseuse',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         widget.item.title,
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -451,9 +634,17 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
                   title: Text('Chapitre ${ch.chapterNumber}'),
                   subtitle: Text(
                     '${ch.pageCount} pages · ${widget.service.formatSize(ch.fileSize.toInt())}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
-                  activeColor: Colors.blue,
+                  secondary: IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 20),
+                    color: Theme.of(context).colorScheme.error,
+                    tooltip: 'Supprimer ce chapitre',
+                    onPressed: () => _deleteChapter(ch.chapterNumber),
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
                   dense: true,
                 );
               },
@@ -477,53 +668,47 @@ class _ExportBottomSheetState extends State<_ExportBottomSheet> {
                     onChanged: (v) => setState(() => _merge = v),
                     title: const Text('Volume fusionné'),
                     subtitle: const Text(
-                      'Un seul fichier CBZ pour tous les chapitres',
-                    ),
-                    activeThumbColor: Colors.blue,
+                        'Un seul fichier CBZ pour tous les chapitres'),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
                 const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.info_outline, size: 16, color: Colors.blue),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Les fichiers seront copiés dans le stockage externe de votre téléphone. Connectez ensuite un câble USB et copiez-les vers votre liseuse.',
-                          style: TextStyle(fontSize: 12, color: Colors.blue),
+                Builder(builder: (context) {
+                  final scheme = Theme.of(context).colorScheme;
+                  return Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline,
+                            size: 16, color: scheme.onPrimaryContainer),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Les fichiers seront copiés dans le stockage externe de votre téléphone. Connectez ensuite un câble USB et copiez-les vers votre liseuse.',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: scheme.onPrimaryContainer),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                }),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 48,
-                  child: ElevatedButton.icon(
+                  child: FilledButton.icon(
                     onPressed: _selected.isEmpty || _loading ? null : _export,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     icon: _loading
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save_alt),
                     label: _loading

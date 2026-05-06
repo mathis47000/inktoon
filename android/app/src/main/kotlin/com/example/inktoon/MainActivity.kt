@@ -32,7 +32,6 @@ class MainActivity : FlutterFragmentActivity() {
 
     companion object {
         private const val NOTIF_CHANNEL_ID = "inktoon_export"
-        private const val NOTIF_DOWNLOAD_ID = 1000
         private const val NOTIF_EXPORT_ID = 1001
         private const val NOTIF_TRANSFER_ID = 1002
         private const val NOTIF_DONE_ID = 1003
@@ -124,8 +123,10 @@ class MainActivity : FlutterFragmentActivity() {
                     "listExportedFiles"          -> handleListExportedFiles(result)
                     "transferToEReader"          -> handleTransferToEReader(call, result)
                     "getConnectedUsbDevices"     -> handleGetUsbDevices(result)
+                    "startDownloadService"       -> handleStartDownloadService(call, result)
                     "updateDownloadNotification" -> handleUpdateDownloadNotif(call, result)
                     "cancelDownloadNotification" -> handleCancelDownloadNotif(result)
+                    "deleteExportedFile"         -> handleDeleteExportedFile(call, result)
                     else -> result.notImplemented()
                 }
             }
@@ -313,7 +314,28 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
-    // ── download notifications ────────────────────────────────────────────────
+    // ── download foreground service ───────────────────────────────────────────
+
+    private fun startOrUpdateDownloadService(title: String, text: String, progress: Int, max: Int) {
+        val intent = Intent(this, DownloadService::class.java).apply {
+            action = DownloadService.ACTION_UPDATE
+            putExtra("title", title)
+            putExtra("text", text)
+            putExtra("progress", progress)
+            putExtra("max", max)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+    }
+
+    private fun handleStartDownloadService(call: MethodCall, result: MethodChannel.Result) {
+        val title = call.argument<String>("title") ?: "Téléchargement en cours"
+        startOrUpdateDownloadService(title, "Démarrage...", 0, 0)
+        result.success(null)
+    }
 
     private fun handleUpdateDownloadNotif(call: MethodCall, result: MethodChannel.Result) {
         val current     = call.argument<Int>("current")     ?: 0
@@ -321,18 +343,32 @@ class MainActivity : FlutterFragmentActivity() {
         val currentPage = call.argument<Int>("currentPage") ?: 0
         val totalPages  = call.argument<Int>("totalPages")  ?: 0
         val title       = call.argument<String>("title")    ?: "Téléchargement en cours"
-        val nm = NotificationManagerCompat.from(this)
         val text = buildString {
             append("Ch. $current / $total")
             if (totalPages > 0) append(" · Page $currentPage / $totalPages")
         }
-        showProgress(nm, NOTIF_DOWNLOAD_ID, title, text, current, total)
+        startOrUpdateDownloadService(title, text, current, total)
         result.success(null)
     }
 
     private fun handleCancelDownloadNotif(result: MethodChannel.Result) {
-        NotificationManagerCompat.from(this).cancel(NOTIF_DOWNLOAD_ID)
+        startService(Intent(this, DownloadService::class.java).apply {
+            action = DownloadService.ACTION_STOP
+        })
         result.success(null)
+    }
+
+    // ── deleteExportedFile ────────────────────────────────────────────────────
+
+    private fun handleDeleteExportedFile(call: MethodCall, result: MethodChannel.Result) {
+        val uri = call.argument<String>("uri")
+        if (uri == null) { result.error("MISSING_ARG", "uri required", null); return }
+        try {
+            val deleted = contentResolver.delete(Uri.parse(uri), null, null)
+            result.success(deleted > 0)
+        } catch (e: Exception) {
+            result.error("DELETE_ERROR", e.message, null)
+        }
     }
 
     // ── getConnectedUsbDevices ─────────────────────────────────────────────────

@@ -20,6 +20,7 @@ class ChapterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final blocked = isDisabled || isDownloaded;
     return GestureDetector(
       onTap: blocked ? null : onTap,
@@ -30,17 +31,17 @@ class ChapterTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isDownloaded
-                  ? Colors.grey[400]!
+                  ? scheme.outlineVariant
                   : isSelected
-                      ? Colors.blue
-                      : Colors.grey[300]!,
-              width: isSelected ? 3 : 1,
+                      ? scheme.primary
+                      : scheme.outlineVariant,
+              width: isSelected ? 2.5 : 1,
             ),
             color: isDownloaded
-                ? Colors.grey[100]
+                ? scheme.surfaceContainerHighest
                 : isSelected
-                    ? Colors.blue.withValues(alpha: 0.1)
-                    : Colors.white,
+                    ? scheme.primaryContainer.withValues(alpha: 0.5)
+                    : scheme.surface,
           ),
           child: Stack(
             children: [
@@ -85,10 +86,10 @@ class ChapterTile extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: isDownloaded
-                                    ? Colors.grey[500]
+                                    ? scheme.onSurfaceVariant
                                     : isSelected
-                                        ? Colors.blue
-                                        : Colors.black87,
+                                        ? scheme.primary
+                                        : scheme.onSurface,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -98,7 +99,7 @@ class ChapterTile extends StatelessWidget {
                               chapter.episodeTitle,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[700],
+                                color: scheme.onSurfaceVariant,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -143,7 +144,7 @@ class ChapterTile extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: scheme.primary,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
